@@ -7,6 +7,10 @@ const projectSchema = new Schema(
       required: true,
       trim: true,
     },
+    teamLead:{
+      type: String,
+      trim: true
+    },
     team: {
       type: Schema.Types.ObjectId,
       ref: "User",

@@ -13,7 +13,16 @@ import {
 
 //registerUser
 export const registerUser = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, userRole="user", secret } = req.body;
+
+  if(userRole==="admin"){
+    if(!secret){
+      return res.status(400).json(new ApiError("Admin registration requires a secret key", 400));
+    }
+    if(secret!==process.env.ADMIN_SECRET){
+      return res.status(400).json(new ApiError("Invalid secret key", 400));
+    }
+  }
   // check all fields there or not
   if (!firstName || !email || !password) {
     return res
@@ -43,6 +52,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     avatar,
+    userRole,
   });
 
   if (!user._id) {
@@ -69,6 +79,7 @@ export const registerUser = asyncHandler(async (req, res) => {
           lastName,
           email,
           avatar,
+          userRole,
           accessToken,
           refreshToken,
         },
@@ -116,8 +127,16 @@ export const loginUser = asyncHandler(async (req, res) => {
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-  const user = req.user;
-  await user.save({ validateBeforeSave: false });
+  const userId = req.user._id;
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      refreshToken: null,
+    },
+    {
+      new: true,
+    }
+  );
   res
     .status(200)
     .clearCookie("accessToken", cookieOptions)
@@ -239,7 +258,7 @@ export const uploadOrUpdateAvatar = asyncHandler(async (req, res) => {
       console.log("avatar deleted", avatar);
     }
     const avatarLocalPath = req.file.path;
-    if(!avatarLocalPath){
+    if (!avatarLocalPath) {
       return res.status(400).json(new ApiError("Image uploading failed", 400));
     }
     const avatar = await uploadOnCloudinary(avatarLocalPath);

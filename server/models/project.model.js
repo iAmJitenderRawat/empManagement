@@ -7,13 +7,15 @@ const projectSchema = new Schema(
       required: true,
       trim: true,
     },
-    teamLead:{
-      type: String,
-      trim: true
+    timeline: {
+      type: Number,
+      required: true,
     },
-    team: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    teamLead: {
+      type: String,
+    },
+    teamMembers: {
+      type: [String],
     },
   },
   { timestamps: true }

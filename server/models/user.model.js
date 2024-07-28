@@ -38,6 +38,11 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    userRole:{
+      type: String,
+      enum: ["admin", "user"],
+      default: "user"
+    }
   },
   { timestamps: true }
 );

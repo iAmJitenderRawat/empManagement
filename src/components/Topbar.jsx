@@ -14,10 +14,12 @@ import {
   useColorModeValue,
   Stack,
   useToast,
+  Image,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../services/auth";
+import logo from "./../../public/Employee.png"
 
 export default function Topbar({ user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -58,7 +60,9 @@ export default function Topbar({ user }) {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={"center"}>
-            <Link to={"/"}>Logo</Link>
+            <Link to={"/"}>
+            <Image w={50} src={logo} alt={"logo"} />
+            </Link>
             <HStack
               as={"nav"}
               spacing={4}

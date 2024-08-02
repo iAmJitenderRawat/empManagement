@@ -1,8 +1,9 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { logout, setCredentials } from "../features/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${import.meta.env.VITE_BASE_URL}/user`,
+  baseUrl: import.meta.env.VITE_BASE_URL,
   credentials: "include",
 });
 
@@ -12,17 +13,15 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   if (result.error && result.error.status === 401) {
     // try to get a new token
     const refreshResult = await baseQuery(
-      "/refreshAccessToken",
+      "/user/refreshAccessToken",
       api,
       extraOptions
     );
-    console.log(refreshResult);
+    console.log(refreshResult, "baseQueryWithReauth");
     if (refreshResult.data) {
       // store the new token
       api.dispatch(
-        authApi.util.updateQueryData("refreshToken", undefined, (draft) => {
-          draft.accessToken = refreshResult.data.accessToken;
-        })
+        api.dispatch(setCredentials(refreshResult.data.data))
       );
       // retry the original query with new access token
       result = await baseQuery(args, api, extraOptions);
@@ -38,25 +37,54 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const profileApi = createApi({
   reducerPath: "profileApi",
   baseQuery: baseQueryWithReauth,
+  tagTypes: ["avatar", "getCurrentUser"],
   endpoints: (builder) => ({
+    getCurrentUser: builder.query({
+      query: (token) => ({
+        url: "/user/getCurrentUser",
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      providesTags: ["getCurrentUser","avatar"],
+    }),
+    //refresh access-token
+    refreshAccessToken: builder.query({
+      query: () => ({
+        url: "/user/refreshAccessToken",
+        method: "GET",
+      }),
+    }),
     uploadAvatar: builder.mutation({
       query: (file) => {
         const formData = new FormData();
         formData.append("avatar", file);
-        console.log('formData', formData)
+        console.log("formData", formData);
         return {
-          url: "/uploadAvatar",
+          url: "/user/uploadAvatar",
           method: "PATCH",
           body: formData,
         };
       },
+      invalidatesTags: ["avatar"],
     }),
     updateUser: builder.mutation({
       query: (userDetail) => {
         return {
-          url: "/updateUser",
+          url: "/user/updateUser",
           method: "PATCH",
           body: userDetail,
+        };
+      },
+      invalidatesTags: ["avatar"],
+    }),
+    changePassword: builder.mutation({
+      query: (passwords) => {
+        return {
+          url: "/user/changePassword",
+          method: "POST",
+          body: passwords,
         };
       },
     }),
@@ -65,4 +93,4 @@ export const profileApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useUploadAvatarMutation, useUpdateUserMutation } = profileApi;
+export const { useUploadAvatarMutation, useUpdateUserMutation, useChangePasswordMutation, useGetCurrentUserQuery, useLazyGetCurrentUserQuery } = profileApi;

@@ -5,11 +5,12 @@ import {
   deleteFromCloudinary,
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
-import { cookieOptions } from "../utils/constants.js";
+import { accessCookieOptions, refreshCookieOptions } from "../utils/constants.js";
 import {
   generateAccessAndRefreshToken,
   isValidEmail,
 } from "../utils/helperFunctions.js";
+import jwt from "jsonwebtoken";
 
 //registerUser
 export const registerUser = asyncHandler(async (req, res) => {
@@ -70,8 +71,8 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
+    .cookie("accessToken", accessToken, accessCookieOptions)
+    .cookie("refreshToken", refreshToken, refreshCookieOptions)
     .json(
       new ApiResponse(
         {
@@ -115,8 +116,8 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
+    .cookie("accessToken", accessToken, accessCookieOptions)
+    .cookie("refreshToken", refreshToken, refreshCookieOptions)
     .json(
       new ApiResponse(
         { user, accessToken, refreshToken },
@@ -139,8 +140,8 @@ export const logoutUser = asyncHandler(async (req, res) => {
   );
   res
     .status(200)
-    .clearCookie("accessToken", cookieOptions)
-    .clearCookie("refreshToken", cookieOptions)
+    .clearCookie("accessToken", accessCookieOptions)
+    .clearCookie("refreshToken", refreshCookieOptions)
     .json(new ApiResponse(null, "User logged out successfully", 200));
 });
 
@@ -150,15 +151,16 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   if (!incomingRefreshToken) {
     return res.status(401).json(new ApiError("Unauthorize request", 401));
   }
+  const decoded = jwt.verify(
+    incomingRefreshToken,
+    process.env.REFRESH_TOKEN_SECRET
+  );
+  console.log('decoded', decoded)
+  if (!decoded._id) {
+    return res.status(400).json(new ApiError("Invalid refresh token", 400));
+  }
   try {
-    const decoded = jwt.verify(
-      incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
-    if (!decoded._id) {
-      return res.status(400).json(new ApiError("Invalid refresh token", 400));
-    }
-    const user = await User.findById(decoded._id);
+    const user = await User.findById(decoded._id).select("-password");
     if (incomingRefreshToken !== user.refreshToken) {
       return res
         .status(400)
@@ -169,12 +171,12 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     }
     const { accessToken, refreshToken, message } =
       await generateAccessAndRefreshToken(user._id);
-
+    user.refreshToken=null;
     return res
       .status(200)
-      .cookie("accessToken", accessToken, cookieOptions)
-      .cookie("refreshToken", refreshToken, cookieOptions)
-      .json(new ApiResponse({ accessToken, refreshToken }, message, 200));
+      .cookie("accessToken", accessToken, accessCookieOptions)
+      .cookie("refreshToken", refreshToken, refreshCookieOptions)
+      .json(new ApiResponse({ accessToken, user }, message, 200));
   } catch (error) {
     return res.status(401).json(new ApiError("Invalid refresh token", 401));
   }
@@ -182,7 +184,10 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
 export const changePassword = asyncHandler(async (req, res) => {
   try {
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+    if(newPassword!==confirmPassword){
+      return res.status(400).json(new ApiError("Passwords do not match", 400));
+    }
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(400).json(new ApiError("User not found", 400));
@@ -204,11 +209,14 @@ export const changePassword = asyncHandler(async (req, res) => {
 });
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
+  if(!req.user._id){
+    return res.status(401).json(new ApiError("Unauthorized", 401));
+  }
   return res.status(200).json(new ApiResponse(req.user, "User found", 200));
 });
 
 export const updateUser = asyncHandler(async (req, res) => {
-  const { email, firstName, lastName, isAvaiable } = req.body;
+  const { email, firstName, lastName, isAvaiable, bio, hobbies } = req.body;
 
   if(!(firstName && email)){
     return res.status(400).json(new ApiError("First name and email are required.",400));
@@ -229,6 +237,8 @@ export const updateUser = asyncHandler(async (req, res) => {
           lastName,
           email,
           isAvaiable,
+          bio,
+          hobbies
         },
       },
       { new: true }
@@ -257,7 +267,7 @@ export const uploadOrUpdateAvatar = asyncHandler(async (req, res) => {
 
     }
     const avatarLocalPath = req?.file?.path;
-console.log(avatarLocalPath, "avatarLocalPath");
+
     if (!avatarLocalPath) {
       return res.status(400).json(new ApiError("Image uploading failed", 400));
     }

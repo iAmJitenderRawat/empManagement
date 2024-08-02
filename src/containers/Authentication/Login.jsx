@@ -31,7 +31,7 @@ export default function LogIn() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleClick = async () => {
@@ -44,7 +44,6 @@ export default function LogIn() {
         duration: 3000,
         isClosable: true,
       });
-      console.log("result", result);
 
       dispatch(setCredentials(result?.data?.data));
       if (result?.data?.code === 200) {
@@ -91,7 +90,16 @@ export default function LogIn() {
             </FormControl>
             <FormControl id="password">
               <FormLabel>Password</FormLabel>
-              <Input type="password" name="password" onChange={handleChange} />
+              <Input
+                type="password"
+                name="password"
+                onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleClick();
+                  }
+                }}
+              />
             </FormControl>
             <Stack spacing={10}>
               <Stack

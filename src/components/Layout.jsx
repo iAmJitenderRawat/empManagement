@@ -1,19 +1,15 @@
 import React from 'react'
 import Topbar from './Topbar'
 import { Outlet } from 'react-router-dom'
-import { useGetCurrentUserQuery } from '../services/auth';
+import { useGetCurrentUserQuery } from '../services/profile';
 import Loading from './Loading';
-import ErrorPage from './ErrorPage';
 
 const Layout = () => {
     const { data, isLoading, isError } = useGetCurrentUserQuery();
     if (isLoading) {
       return <Loading />;
     }
-    if (isError) {
-      return <ErrorPage message="Failed to load data." />;
-    }
-
+console.log('data, isLoading, isError', data, isLoading, isError)
     const user = data?.data;
   return (
     <>

@@ -42,6 +42,14 @@ const userSchema = new Schema(
       type: String,
       enum: ["admin", "user"],
       default: "user"
+    },
+    bio:{
+      type: String,
+      trim: true
+    },
+    hobbies:{
+      type: [String],
+      trim:true,
     }
   },
   { timestamps: true }

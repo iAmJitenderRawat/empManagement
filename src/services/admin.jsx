@@ -1,8 +1,9 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { logout } from "../features/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${import.meta.env.VITE_BASE_URL}/admin`,
+  baseUrl: import.meta.env.VITE_BASE_URL,
   credentials: "include",
 });
 
@@ -12,11 +13,11 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   if (result.error && result.error.status === 401) {
     // try to get a new token
     const refreshResult = await baseQuery(
-      "/refreshAccessToken",
+      "/user/refreshAccessToken",
       api,
       extraOptions
     );
-    console.log(refreshResult);
+    console.log(refreshResult, "baseQueryWithReauth");
     if (refreshResult.data) {
       // store the new token
       api.dispatch(
@@ -38,43 +39,49 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: baseQueryWithReauth,
+  tagTypes: ["getAllUsers", "getAllProjects"],
   endpoints: (builder) => ({
     getAllUsers: builder.query({
       query: (token) => ({
-        url: "/getAllUsers",
+        url: "/admin/getAllUsers",
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }),
+      providesTags: ["getAllUsers"],
     }),
     deleteUser: builder.mutation({
       query: () => ({
-        url: "/deleteUser",
+        url: "/admin/deleteUser",
         method: "DELETE",
       }),
+      invalidatesTags: ["getAllUsers"],
     }),
     addProject: builder.mutation({
       query: (project) => ({
-        url: "/addProject",
+        url: "/admin/addProject",
         method: "POST",
         body: project,
       }),
+      invalidatesTags: ["getAllProjects"],
     }),
     getAllProjects: builder.query({
       query: (token) => ({
-        url: "/getAllProjects",
+        url: "/admin/getAllProjects",
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }),
+      providesTags: ["getAllProjects"],
     }),
     deleteProject: builder.mutation({
       query: () => ({
-        url: "/deleteProject",
+        url: "/admin/deleteProject",
         method: "DELETE",
       }),
+      invalidatesTags: ["getAllProjects"],
     }),
   }),
 });

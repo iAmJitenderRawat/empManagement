@@ -19,35 +19,13 @@ import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../services/auth";
 
-const Links = ["dashboard", "projects", "team"];
-
-// const Navlink = (props) => {
-//   const { children } = props;
-
-//   return (
-//     <Box
-//       as="a"
-//       px={2}
-//       py={1}
-//       rounded={"md"}
-//       _hover={{
-//         textDecoration: "none",
-//         bg: useColorModeValue("gray.200", "gray.700"),
-//       }}
-//       href={"#"}
-//     >
-//       {children}
-//     </Box>
-//   );
-// };
-
 export default function Topbar({ user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const toast = useToast();
   const [logoutUser] = useLogoutMutation();
 
-  const handleLogout =async () => {
+  const handleLogout = async () => {
     try {
       await logoutUser();
       toast({
@@ -56,7 +34,7 @@ export default function Topbar({ user }) {
         duration: 2000,
         isClosable: true,
       });
-      navigate("/login")
+      navigate("/login");
     } catch (error) {
       toast({
         position: "top",
@@ -86,9 +64,15 @@ export default function Topbar({ user }) {
               spacing={4}
               display={{ base: "none", md: "flex" }}
             >
-              {Links.map((link) => (
-                <NavLink key={link} to={`/${link}`}>{link}</NavLink>
-              ))}
+              <NavLink to={"#"}>About</NavLink>
+              <NavLink to={"/contact"}>Contact</NavLink>
+              <NavLink to={"/profile"}>Profile</NavLink>
+              {user?.userRole === "admin" && (
+                <>
+                  <NavLink to={"/dashboard"}>Dashboard</NavLink>
+                  <NavLink to={"/projects"}>Projects</NavLink>
+                </>
+              )}
             </HStack>
           </HStack>
           <Flex alignItems={"center"}>
@@ -100,22 +84,15 @@ export default function Topbar({ user }) {
                 cursor={"pointer"}
                 minW={0}
               >
-                {user?.avatar?.secure_url ? (
-                  <Avatar size={"sm"} src={user?.avatar?.secure_url} />
-                ) : (
-                  <Avatar
-                    size={"sm"}
-                    src="https://gravatar.com/avatar/4b52a0e01acb0825522bffb0bd2c5923?s=400&d=robohash&r=x"
-                  />
-                )}
+                <Avatar size={"sm"} src={user?.avatar?.secure_url} />
               </MenuButton>
               {user?._id ? (
                 <MenuList>
-                  <MenuItem onClick={() => navigate("/profile")}>
-                    Profile
+                  <MenuItem textTransform={"capitalize"}>
+                    {user?.firstName} {user?.lastName}
                   </MenuItem>
-                  <MenuItem onClick={() => navigate("/projects")}>
-                    Projects
+                  <MenuItem>
+                    {user?.email}
                   </MenuItem>
                   <MenuDivider />
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>
@@ -134,10 +111,16 @@ export default function Topbar({ user }) {
 
         {isOpen ? (
           <Box pb={4} display={{ md: "none" }}>
-            <Stack as={"nav"} spacing={4} textTransform={"capitalize"}>
-              {Links.map((link) => (
-                <NavLink key={link} to={`/${link}`}>{link}</NavLink>
-              ))}
+            <Stack as={"nav"} spacing={4}>
+              <NavLink to={"#"}>About</NavLink>
+              <NavLink to={"/contact"}>Contact</NavLink>
+              <NavLink to={"/profile"}>Profile</NavLink>
+              {user?.userRole === "admin" && (
+                <>
+                  <NavLink to={"/dashboard"}>Dashboard</NavLink>
+                  <NavLink to={"/projects"}>Projects</NavLink>
+                </>
+              )}
             </Stack>
           </Box>
         ) : null}

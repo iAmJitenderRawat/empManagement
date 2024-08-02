@@ -6,17 +6,19 @@ import {
   Text,
   Stack,
   Button,
-  Link,
   Badge,
   useColorModeValue,
+  Flex,
 } from "@chakra-ui/react";
-import { useGetCurrentUserQuery } from "../../services/auth";
+import { useGetCurrentUserQuery } from "../../services/profile";
 import Loading from "../../components/Loading";
 import ErrorPage from "../../components/ErrorPage";
 import { useNavigate } from "react-router-dom";
+import ChangePasswordModal from "../../components/ChangePasswordModal";
 
 export default function ProfilePage() {
   const { data, isLoading, isError } = useGetCurrentUserQuery();
+
   const navigate = useNavigate();
   if (isLoading) {
     return <Loading />;
@@ -29,6 +31,9 @@ export default function ProfilePage() {
 
   return (
     <main>
+      <Center>
+        <Heading>Profile</Heading>
+      </Center>
       <Center py={6}>
         <Box
           maxW={"320px"}
@@ -39,43 +44,23 @@ export default function ProfilePage() {
           p={6}
           textAlign={"center"}
         >
-          {user?.avatar?.secure_url ? (
-            <Avatar
-              size={"xl"}
-              src={user?.avatar?.secure_url}
-              mb={4}
-              pos={"relative"}
-              _after={{
-                content: '""',
-                w: 4,
-                h: 4,
-                bg: "green.300",
-                border: "2px solid white",
-                rounded: "full",
-                pos: "absolute",
-                bottom: 0,
-                right: 3,
-              }}
-            />
-          ) : (
-            <Avatar
-              size={"xl"}
-              src="https://gravatar.com/avatar/4b52a0e01acb0825522bffb0bd2c5923?s=400&d=robohash&r=x"
-              mb={4}
-              pos={"relative"}
-              _after={{
-                content: '""',
-                w: 4,
-                h: 4,
-                bg: "green.300",
-                border: "2px solid white",
-                rounded: "full",
-                pos: "absolute",
-                bottom: 0,
-                right: 3,
-              }}
-            />
-          )}
+          <Avatar
+            size={"xl"}
+            src={user?.avatar?.secure_url}
+            mb={4}
+            pos={"relative"}
+            _after={{
+              content: '""',
+              w: 4,
+              h: 4,
+              bg: "green.300",
+              border: "2px solid white",
+              rounded: "full",
+              pos: "absolute",
+              bottom: 0,
+              right: 3,
+            }}
+          />
           <Heading
             textTransform={"capitalize"}
             fontSize={"2xl"}
@@ -91,46 +76,25 @@ export default function ProfilePage() {
             color={useColorModeValue("gray.700", "gray.400")}
             px={3}
           >
-            Actress, musician, songwriter and artist. PM for work inquires or{" "}
-            <Text color={"blue.400"}>#tag</Text> me in your posts
+            {user?.bio}
           </Text>
-          <Stack align={"center"} justify={"center"} direction={"row"} mt={6}>
-            <Badge
-              px={2}
-              py={1}
-              bg={useColorModeValue("gray.50", "gray.800")}
-              fontWeight={"400"}
-            >
-              #art
-            </Badge>
-            <Badge
-              px={2}
-              py={1}
-              bg={useColorModeValue("gray.50", "gray.800")}
-              fontWeight={"400"}
-            >
-              #photography
-            </Badge>
-            <Badge
-              px={2}
-              py={1}
-              bg={useColorModeValue("gray.50", "gray.800")}
-              fontWeight={"400"}
-            >
-              #music
-            </Badge>
-          </Stack>
+          {user?.hobbies?.length>0 && <Text color={"blue.400"}>Hobbies</Text>}
+          <Flex flexWrap={"wrap"} align={"center"} justify={"center"} direction={"row"} mt={1}>
+            {user?.hobbies?.length > 0 &&
+              user?.hobbies?.map((hobby, i) => (
+                <Badge
+                  key={i + hobby}
+                  px={2}
+                  py={1}
+                  bg={useColorModeValue("gray.50", "gray.800")}
+                  fontWeight={"400"}
+                >
+                  #{hobby}
+                </Badge>
+              ))}
+          </Flex>
           <Stack mt={8} direction={"row"} spacing={4}>
-            <Button
-              flex={1}
-              fontSize={"sm"}
-              rounded={"full"}
-              _focus={{
-                bg: "gray.200",
-              }}
-            >
-              Message
-            </Button>
+            <ChangePasswordModal />
             <Button
               flex={1}
               fontSize={"sm"}

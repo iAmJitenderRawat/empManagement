@@ -8,6 +8,7 @@ import { EditProfilePage } from "./containers/Profile/EditProfilePage";
 import Layout from "./components/Layout";
 import Projects from "./containers/Projects/Projects";
 import Dashboard from "./containers/Dashboard/Dashboard";
+import Contact from "./containers/Contact/Contact";
 
 export const router = createBrowserRouter([
   {
@@ -20,20 +21,46 @@ export const router = createBrowserRouter([
       },
       {
         path: "projects",
-        element: (
-          <ProtectedRoute>
-            <Projects />
-          </ProtectedRoute>
-        ),
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "",
+            element: <Projects />,
+            },
+        ]
       },
       {
         path: "dashboard",
-        element: (
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        ),
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "",
+            element: <Dashboard />,
+            },
+        ]
       },
+      {
+        path: "profile",
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "",
+            element: (
+                <ProfilePage />
+            ),
+          },
+          {
+            path: "edit",
+            element: (
+                <EditProfilePage />
+            ),
+          },
+        ],
+      },
+      {
+        path: "contact",
+        element: <Contact />,
+      }
     ],
   },
   {
@@ -43,27 +70,5 @@ export const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
-  },
-  {
-    path: "/profile",
-    element: <Layout />,
-    children: [
-      {
-        path: "",
-        element: (
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "edit",
-        element: (
-          <ProtectedRoute>
-            <EditProfilePage />
-          </ProtectedRoute>
-        ),
-      },
-    ],
   },
 ]);

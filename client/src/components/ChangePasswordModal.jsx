@@ -32,7 +32,6 @@ const ChangePasswordModal = () => {
   const handleChangePassword = async () => {
     try {
       const result = await changePassword(password);
-      console.log("res", result);
       toast({
         position: "top",
         title: result?.data?.message ?? result.error?.data?.message,

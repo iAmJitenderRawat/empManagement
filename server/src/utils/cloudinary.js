@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
+import fs from "fs/promises";
 import { ApiError, ApiResponse } from "./apiHelpers.js";
 
 export const uploadOnCloudinary = async (localFilePath) => {
@@ -10,21 +10,17 @@ export const uploadOnCloudinary = async (localFilePath) => {
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 
-  if (!localFilePath){
-    return res.status(400).json(new ApiError("Local file path is required",400));
-  };
+  if (!localFilePath) {
+    return res
+      .status(400)
+      .json(new ApiError("Local file path is required", 400));
+  }
   // Upload an image
   try {
-    const uploadResult = await cloudinary.uploader
-      .upload(localFilePath, {
-        resource_type: "image",
-        folder: "employeeProfilePic",
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => fs.unlinkSync(localFilePath));
-
+    const uploadResult = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "image",
+      folder: "employeeProfilePic",
+    });
     const { public_id, secure_url, resource_type } = uploadResult ?? {};
 
     // Optimize delivery by resizing and applying auto-format and auto-quality
@@ -36,12 +32,15 @@ export const uploadOnCloudinary = async (localFilePath) => {
     return { public_id, secure_url, resource_type, optimize_url };
   } catch (error) {
     console.log(error);
+  } finally{
+    // Delete the local file after upload
+    await fs.unlink(localFilePath);
   }
 };
 
 //deleteFromCloudinary
 
-export const deleteFromCloudinary = async (req, res) => {
+export const deleteFromCloudinary = async (avatar) => {
   // Configuration
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -50,19 +49,17 @@ export const deleteFromCloudinary = async (req, res) => {
   });
 
   try {
-    const { public_id, resource_type } = req;
+    const { public_id, resource_type } = avatar;
     const destroyOptions = { resource_type }; // Pass resource_type as an option
     const { result } = await cloudinary.uploader.destroy(
       public_id,
       destroyOptions
     );
+
     if (result === "ok") {
-      return res.status(200).json(new ApiResponse(result, "File deleted successfully", 200));
-    } 
+      return { status: 200 };
+    }
   } catch (error) {
-    console.log('error**', error)
-    return res
-      .status(500)
-      .json(new ApiError(error.message || "Internal Server Error", 500));
+    return { message: error.message, status: error?.status || 500 };
   }
 };

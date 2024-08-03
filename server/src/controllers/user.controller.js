@@ -5,7 +5,10 @@ import {
   deleteFromCloudinary,
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
-import { accessCookieOptions, refreshCookieOptions } from "../utils/constants.js";
+import {
+  accessCookieOptions,
+  refreshCookieOptions,
+} from "../utils/constants.js";
 import {
   generateAccessAndRefreshToken,
   isValidEmail,
@@ -14,13 +17,22 @@ import jwt from "jsonwebtoken";
 
 //registerUser
 export const registerUser = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, password, userRole="user", secret } = req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    userRole = "user",
+    secret,
+  } = req.body;
 
-  if(userRole==="admin"){
-    if(!secret){
-      return res.status(400).json(new ApiError("Admin registration requires a secret key", 400));
+  if (userRole === "admin") {
+    if (!secret) {
+      return res
+        .status(400)
+        .json(new ApiError("Admin registration requires a secret key", 400));
     }
-    if(secret!==process.env.ADMIN_SECRET){
+    if (secret !== process.env.ADMIN_SECRET) {
       return res.status(400).json(new ApiError("Invalid secret key", 400));
     }
   }
@@ -155,7 +167,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     incomingRefreshToken,
     process.env.REFRESH_TOKEN_SECRET
   );
-  console.log('decoded', decoded)
+  console.log("decoded", decoded);
   if (!decoded._id) {
     return res.status(400).json(new ApiError("Invalid refresh token", 400));
   }
@@ -171,7 +183,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     }
     const { accessToken, refreshToken, message } =
       await generateAccessAndRefreshToken(user._id);
-    user.refreshToken=null;
+    user.refreshToken = null;
     return res
       .status(200)
       .cookie("accessToken", accessToken, accessCookieOptions)
@@ -185,7 +197,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 export const changePassword = asyncHandler(async (req, res) => {
   try {
     const { oldPassword, newPassword, confirmPassword } = req.body;
-    if(newPassword!==confirmPassword){
+    if (newPassword !== confirmPassword) {
       return res.status(400).json(new ApiError("Passwords do not match", 400));
     }
     const user = await User.findById(req.user._id);
@@ -209,7 +221,7 @@ export const changePassword = asyncHandler(async (req, res) => {
 });
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
-  if(!req.user._id){
+  if (!req.user._id) {
     return res.status(401).json(new ApiError("Unauthorized", 401));
   }
   return res.status(200).json(new ApiResponse(req.user, "User found", 200));
@@ -218,8 +230,10 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
   const { email, firstName, lastName, isAvaiable, bio, hobbies } = req.body;
 
-  if(!(firstName && email)){
-    return res.status(400).json(new ApiError("First name and email are required.",400));
+  if (!(firstName && email)) {
+    return res
+      .status(400)
+      .json(new ApiError("First name and email are required.", 400));
   }
 
   try {
@@ -238,7 +252,7 @@ export const updateUser = asyncHandler(async (req, res) => {
           email,
           isAvaiable,
           bio,
-          hobbies
+          hobbies,
         },
       },
       { new: true }
@@ -253,27 +267,31 @@ export const updateUser = asyncHandler(async (req, res) => {
 });
 
 export const uploadOrUpdateAvatar = asyncHandler(async (req, res) => {
-  try {
-    const user = req.user;
-    if (!user._id) {
-      return res.status(400).json(new ApiError("User not found", 400));
-    }
+  const avatarLocalPath = req?.file?.path;
 
+  if (!avatarLocalPath) {
+    return res.status(400).json(new ApiError("Image uploading failed", 400));
+  }
+  const user = req.user;
+  if (!user._id) {
+    return res.status(400).json(new ApiError("User not found", 400));
+  }
+  
+  try {
     if (!!user?.avatar?.public_id) {
-      await deleteFromCloudinary({
+      const result = await deleteFromCloudinary({
         public_id: user?.avatar?.public_id,
         resource_type: user?.avatar?.resource_type,
       });
-
-    }
-    const avatarLocalPath = req?.file?.path;
-
-    if (!avatarLocalPath) {
-      return res.status(400).json(new ApiError("Image uploading failed", 400));
+      if (result?.status !== 200) {
+        return res
+          .status(400)
+          .json(new ApiError("Failed to delete image from cloudinary", 400));
+      }
     }
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-    if(!avatar){
+    if (!avatar) {
       return res.status(400).json(new ApiError("Image uploading failed", 400));
     }
 
@@ -286,7 +304,7 @@ export const uploadOrUpdateAvatar = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(updatedUser, "User profile updated successfully"));
   } catch (error) {
-    console.log('error*', error)
+    console.log("error*", error);
     return res.status(400).json(new ApiError(error.message, 400));
   }
 });

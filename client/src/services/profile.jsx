@@ -3,13 +3,12 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout, setCredentials } from "../features/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_BASE_URL,
+  baseUrl: import.meta.env.VITE_BACKEND_URL,
   credentials: "include",
 });
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-  console.log(result);
   if (result.error && result.error.status === 401) {
     // try to get a new token
     const refreshResult = await baseQuery(
@@ -17,7 +16,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
-    console.log(refreshResult, "baseQueryWithReauth");
     if (refreshResult.data) {
       // store the new token
       api.dispatch(
@@ -60,7 +58,6 @@ export const profileApi = createApi({
       query: (file) => {
         const formData = new FormData();
         formData.append("avatar", file);
-        console.log("formData", formData);
         return {
           url: "/user/uploadAvatar",
           method: "PATCH",

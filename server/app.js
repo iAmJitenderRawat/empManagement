@@ -1,30 +1,28 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
-dotenv.config();
 
 const app = express();
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://employee-manager-x9d8.onrender.com",
-    ],
+    origin: process.env.FRONTEND_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json({ limit: "15kb" }));
-app.use(express.urlencoded({limit:"15kb", extended: true}));
+app.use(express.urlencoded({ limit: "15kb", extended: true }));
 app.use(cookieParser());
 
 //import routes
-import userRoutes from "./routes/user.route.js"
-import adminRoutes from "./routes/admin.route.js";
+import userRoutes from "./src/routes/user.route.js";
+import adminRoutes from "./src/routes/admin.route.js";
 
 //route
 app.use("/api/user", userRoutes);
-app.use("/api/admin", adminRoutes)
+app.use("/api/admin", adminRoutes);
 
-export {app};
+export { app };

@@ -42,6 +42,14 @@ const userSchema = new Schema(
       type: String,
       enum: ["admin", "user"],
       default: "user"
+    },
+    bio:{
+      type: String,
+      trim: true
+    },
+    hobbies:{
+      type: [String],
+      trim:true,
     }
   },
   { timestamps: true }
@@ -58,8 +66,8 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.generateAccessToken = async function () {
-  const token = await jwt.sign(
+userSchema.methods.generateAccessToken = function () {
+  const token = jwt.sign(
     {
       _id: this._id,
       email: this.email,
@@ -72,8 +80,8 @@ userSchema.methods.generateAccessToken = async function () {
   return token;
 };
 
-userSchema.methods.generateRefreshToken = async function () {
-  const token = await jwt.sign(
+userSchema.methods.generateRefreshToken = function () {
+  const token = jwt.sign(
     {
       _id: this._id,
     },

@@ -19,7 +19,7 @@ import {
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../services/auth";
-import logo from "./../../public/Employee.png"
+import logo from "/eManager.png"
 
 export default function Topbar({ user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();

@@ -1,11 +1,11 @@
 export const accessCookieOptions = {
   httpOnly: true,
   secure: true,
-  maxAge:300000
+  maxAge: process.env.ACCESS_TOKEN_MAX_AGE,
 };
 
 export const refreshCookieOptions = {
   httpOnly: true,
   secure: true,
-  maxAge: 864000000,
+  maxAge: process.env.REFRESH_TOKEN_MAX_AGE,
 };

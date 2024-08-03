@@ -17,30 +17,35 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../../services/auth";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
-  const [formData, setFormData] = useState({
+  const initState = {
     firstName: "",
     lastName: "",
     email: "",
     secret: "",
-    userRole:"user",
+    userRole: "user",
     password: "",
-  });
-
-  const [registerUser,{isLoading,isError,isSuccess,reset}]=useRegisterMutation();
-  const toast= useToast();
-
-  const handleChange=(e)=>{
-    const {name, value}=e.target;
-    setFormData({...formData,[name]:value})
   };
+  const [formData, setFormData] = useState();
+
+  const [registerUser, { isLoading, isError, isSuccess, reset }] =
+    useRegisterMutation();
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
   const handleSubmit = async () => {
-      const result= await registerUser(formData);
+    try {
+      const result = await registerUser(formData);
       toast({
         position: "top",
         title: result?.data?.message ?? result.error?.data?.message,
@@ -48,8 +53,20 @@ export default function Register() {
         duration: 3000,
         isClosable: true,
       });
-      reset();
-    };
+      if (result?.data?.status === "success") {
+        setFormData(initState);
+        navigate("/");
+      }
+    } catch (error) {
+      toast({
+        position: "top",
+        title: error?.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
   return (
     <Flex
@@ -78,19 +95,34 @@ export default function Register() {
               <Box>
                 <FormControl id="firstName" isRequired>
                   <FormLabel>First Name</FormLabel>
-                  <Input type="text" name="firstName" onChange={handleChange} />
+                  <Input
+                    type="text"
+                    name="firstName"
+                    onChange={handleChange}
+                    value={formData?.firstName}
+                  />
                 </FormControl>
               </Box>
               <Box>
                 <FormControl id="lastName">
                   <FormLabel>Last Name</FormLabel>
-                  <Input type="text" name="lastName" onChange={handleChange} />
+                  <Input
+                    type="text"
+                    name="lastName"
+                    onChange={handleChange}
+                    value={formData?.lastName}
+                  />
                 </FormControl>
               </Box>
             </HStack>
             <FormControl id="email" isRequired>
               <FormLabel>Email address</FormLabel>
-              <Input type="email" name="email" onChange={handleChange} />
+              <Input
+                type="email"
+                name="email"
+                onChange={handleChange}
+                value={formData?.email}
+              />
             </FormControl>
             <FormControl id="password" isRequired>
               <FormLabel>Password</FormLabel>
@@ -99,6 +131,7 @@ export default function Register() {
                   type={showPassword ? "text" : "password"}
                   name="password"
                   onChange={handleChange}
+                  value={formData?.password}
                 />
                 <InputRightElement h={"full"}>
                   <Button
@@ -119,12 +152,13 @@ export default function Register() {
                   variant="outline"
                   name="userRole"
                   onChange={handleChange}
+                  value={formData?.userRole}
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
                 </Select>
               </FormControl>
-              {formData.userRole === "admin" && (
+              {formData?.userRole === "admin" && (
                 <FormControl id="secret" isRequired>
                   <FormLabel>Secret</FormLabel>
                   <InputGroup>

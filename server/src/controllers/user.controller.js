@@ -167,7 +167,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     incomingRefreshToken,
     process.env.REFRESH_TOKEN_SECRET
   );
-  console.log("decoded", decoded);
+
   if (!decoded._id) {
     return res.status(400).json(new ApiError("Invalid refresh token", 400));
   }
@@ -276,7 +276,7 @@ export const uploadOrUpdateAvatar = asyncHandler(async (req, res) => {
   if (!user._id) {
     return res.status(400).json(new ApiError("User not found", 400));
   }
-  
+
   try {
     if (!!user?.avatar?.public_id) {
       const result = await deleteFromCloudinary({
@@ -304,7 +304,6 @@ export const uploadOrUpdateAvatar = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(updatedUser, "User profile updated successfully"));
   } catch (error) {
-    console.log("error*", error);
     return res.status(400).json(new ApiError(error.message, 400));
   }
 });

@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 export const accessCookieOptions = {
   httpOnly: true,
   secure: true,

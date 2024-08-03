@@ -1,4 +1,3 @@
-import { current } from "@reduxjs/toolkit";
 import { Project } from "../models/project.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError, ApiResponse } from "../utils/apiHelpers.js";

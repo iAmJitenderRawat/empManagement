@@ -13,15 +13,15 @@ app.use(
   })
 );
 app.use(express.json({ limit: "15kb" }));
-app.use(express.urlencoded({limit:"15kb", extended: true}));
+app.use(express.urlencoded({ limit: "15kb", extended: true }));
 app.use(cookieParser());
 
 //import routes
-import userRoutes from "./routes/user.route.js"
-import adminRoutes from "./routes/admin.route.js";
+import userRoutes from "./src/routes/user.route.js";
+import adminRoutes from "./src/routes/admin.route.js";
 
 //route
 app.use("/api/user", userRoutes);
-app.use("/api/admin", adminRoutes)
+app.use("/api/admin", adminRoutes);
 
-export {app};
+export { app };

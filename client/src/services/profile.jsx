@@ -9,7 +9,6 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-  console.log(result);
   if (result.error && result.error.status === 401) {
     // try to get a new token
     const refreshResult = await baseQuery(
@@ -17,7 +16,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
-    console.log(refreshResult, "baseQueryWithReauth");
     if (refreshResult.data) {
       // store the new token
       api.dispatch(
@@ -60,7 +58,6 @@ export const profileApi = createApi({
       query: (file) => {
         const formData = new FormData();
         formData.append("avatar", file);
-        console.log("formData", formData);
         return {
           url: "/user/uploadAvatar",
           method: "PATCH",

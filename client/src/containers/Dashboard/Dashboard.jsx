@@ -6,7 +6,7 @@ import { Center, Heading } from "@chakra-ui/react";
 const Dashboard = () => {
   const { data, isLoading, isError } = useGetAllUsersQuery();
   const { users, currentPage, totalUsers, totalPages } = data?.data ?? {};
-  console.log("data", data);
+
   if (isLoading) {
     return <Loading />;
   }

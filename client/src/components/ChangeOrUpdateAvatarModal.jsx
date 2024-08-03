@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Button,
+  Center,
   Image,
   Input,
   Modal,
@@ -35,12 +36,23 @@ const ChangeOrUpdateAvatarModal = ({avatarUrl}) => {
   };
 
   const handleUpload = async () => {
-    console.log("avatar?.file", avatar?.file);
     try {
       const result = await uploadAvatar(avatar?.file);
-      console.log("result", result);
+      toast({
+        position: "top",
+        title: result?.data?.message ?? result.error?.data?.message,
+        status: result?.data?.status ?? result.error?.data?.status,
+        duration: 2000,
+        isClosable: true,
+      });
     } catch (error) {
-      console.log("error", error);
+      toast({
+        position: "top",
+        title: error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
   return (

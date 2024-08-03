@@ -3,20 +3,14 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 const app = express();
-const whitelist = [process.env.FRONTEND_URL];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: "GET,HEAD,PATCH,POST,DELETE",
-  credentials: true,
-};
 
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "15kb" }));
 app.use(express.urlencoded({ limit: "15kb", extended: true }));

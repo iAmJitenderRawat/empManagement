@@ -12,6 +12,7 @@ app.use(
     credentials: true,
   })
 );
+console.log('process.env.FRONTEND_URL', process.env.FRONTEND_URL)
 app.use(express.json({ limit: "15kb" }));
 app.use(express.urlencoded({ limit: "15kb", extended: true }));
 app.use(cookieParser());

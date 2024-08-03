@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": import.meta.env.VITE_BACKEND_URL,
+      "/api": "https://e-manager-26ng.onrender.com",
     },
   },
 });

@@ -17,7 +17,7 @@ import {
 import { useUploadAvatarMutation } from "../services/profile";
 
 const ChangeOrUpdateAvatarModal = ({avatarUrl}) => {
-  const [uploadAvatar] = useUploadAvatarMutation();
+  const [uploadAvatar, {isLoading:uploadAvatarLoading}] = useUploadAvatarMutation();
     const [avatar, setAvatar] = useState({
       url: null,
       file: null,
@@ -76,10 +76,10 @@ const ChangeOrUpdateAvatarModal = ({avatarUrl}) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
+            <Button colorScheme="red" variant="ghost" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant="ghost" onClick={handleUpload}>
+            <Button colorScheme="blue" onClick={handleUpload} isLoading={uploadAvatarLoading} loadingText="Uploading">
               Save
             </Button>
           </ModalFooter>

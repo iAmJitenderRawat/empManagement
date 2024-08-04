@@ -9,8 +9,17 @@ import Layout from "./components/Layout";
 import Projects from "./containers/Projects/Projects";
 import Dashboard from "./containers/Dashboard/Dashboard";
 import Contact from "./containers/Contact/Contact";
+import AllUsersPage from "./containers/Dashboard/AllUsersPage";
 
 export const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <LogIn />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
   {
     path: "/",
     element: <Layout />,
@@ -26,8 +35,8 @@ export const router = createBrowserRouter([
           {
             path: "",
             element: <Projects />,
-            },
-        ]
+          },
+        ],
       },
       {
         path: "dashboard",
@@ -36,8 +45,12 @@ export const router = createBrowserRouter([
           {
             path: "",
             element: <Dashboard />,
-            },
-        ]
+          },
+          {
+            path: "users",
+            element: <AllUsersPage />,
+          },
+        ],
       },
       {
         path: "profile",
@@ -45,30 +58,18 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "",
-            element: (
-                <ProfilePage />
-            ),
+            element: <ProfilePage />,
           },
           {
             path: "edit",
-            element: (
-                <EditProfilePage />
-            ),
+            element: <EditProfilePage />,
           },
         ],
       },
       {
         path: "contact",
         element: <Contact />,
-      }
+      },
     ],
-  },
-  {
-    path: "/login",
-    element: <LogIn />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
   },
 ]);

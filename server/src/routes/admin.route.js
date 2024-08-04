@@ -4,7 +4,7 @@ import { addProject, deleteProject, deleteUser, getAllProjects, getAllUsers } fr
 
 const router = Router();
 //users
-router.route("/getAllUsers").get(verifyJWT, getAllUsers);
+router.route("/users").get(verifyJWT, getAllUsers);
 router.route("/deleteUser").delete(verifyJWT, deleteUser);
 
 //projects

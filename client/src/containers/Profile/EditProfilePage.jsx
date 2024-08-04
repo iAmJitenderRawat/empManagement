@@ -31,7 +31,8 @@ export const EditProfilePage = () => {
     hobbies: user?.hobbies ?? [],
   });
   const [hobby, setHobby] = useState("");
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUser, { isLoading: updateUserLoading }] =
+    useUpdateUserMutation();
   const toast = useToast();
 
   const handleChange = (e) => {
@@ -62,7 +63,11 @@ export const EditProfilePage = () => {
 
   return (
     <main>
-      <Center m={2} maxW={{ base: 250 ,sm:350, md:450, lg:550}} margin={"auto"}>
+      <Center
+        m={2}
+        maxW={{ base: 250, sm: 350, md: 450, lg: 550 }}
+        margin={"auto"}
+      >
         <Stack mt={10}>
           <HStack justify={"space-between"} align={"center"}>
             <Box>
@@ -156,7 +161,13 @@ export const EditProfilePage = () => {
               </HStack>
             </FormControl>
           </Stack>
-          <Button onClick={handleClick}>Update Details</Button>
+          <Button
+            isLoading={updateUserLoading}
+            loadingText="Updating"
+            onClick={handleClick}
+          >
+            Update Details
+          </Button>
         </Stack>
       </Center>
     </main>

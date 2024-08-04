@@ -17,7 +17,7 @@ import React, { useState } from "react";
 import { useChangePasswordMutation } from "../services/profile";
 
 const ChangePasswordModal = () => {
-  const [changePassword] = useChangePasswordMutation();
+  const [changePassword,{isLoading}] = useChangePasswordMutation();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast=useToast();
   const [password, setPassword] = useState({
@@ -96,7 +96,7 @@ const ChangePasswordModal = () => {
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant="ghost" onClick={handleChangePassword}>
+            <Button isLoading={isLoading} loadingText="Changing" variant="ghost" onClick={handleChangePassword}>
               Save
             </Button>
           </ModalFooter>

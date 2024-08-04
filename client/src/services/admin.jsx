@@ -40,13 +40,13 @@ export const adminApi = createApi({
   tagTypes: ["getAllUsers", "getAllProjects"],
   endpoints: (builder) => ({
     getAllUsers: builder.query({
-      query: (token) => ({
-        url: "/admin/getAllUsers",
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }),
+      query: (page) => {
+        console.log("token333", page);
+        return {
+          url: `/admin/users?page=${page}`,
+          method: "GET",
+        };
+      },
       providesTags: ["getAllUsers"],
     }),
     deleteUser: builder.mutation({
@@ -68,9 +68,6 @@ export const adminApi = createApi({
       query: (token) => ({
         url: "/admin/getAllProjects",
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       }),
       providesTags: ["getAllProjects"],
     }),
@@ -86,4 +83,10 @@ export const adminApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const {useGetAllUsersQuery,useDeleteUserMutation,useAddProjectMutation,useGetAllProjectsQuery,useDeleteProjectMutation} = adminApi;
+export const {
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
+  useAddProjectMutation,
+  useGetAllProjectsQuery,
+  useDeleteProjectMutation,
+} = adminApi;

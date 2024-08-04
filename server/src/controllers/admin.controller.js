@@ -36,6 +36,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 8;
   const skip = (page - 1) * limit;
+  console.log('req?.query', req?.query)
   if (page < 1) {
     return res.status(400).json(new ApiError("Page can't be less than 1", 403));
   }

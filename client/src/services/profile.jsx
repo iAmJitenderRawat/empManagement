@@ -38,12 +38,9 @@ export const profileApi = createApi({
   tagTypes: ["avatar", "getCurrentUser"],
   endpoints: (builder) => ({
     getCurrentUser: builder.query({
-      query: (token) => ({
+      query: () => ({
         url: "/user/getCurrentUser",
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       }),
       providesTags: ["getCurrentUser","avatar"],
     }),

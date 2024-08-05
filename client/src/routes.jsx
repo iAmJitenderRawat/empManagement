@@ -10,66 +10,65 @@ import Projects from "./containers/Projects/Projects";
 import Dashboard from "./containers/Dashboard/Dashboard";
 import Contact from "./containers/Contact/Contact";
 import AllUsersPage from "./containers/Dashboard/AllUsersPage";
+import About from "./containers/About/About";
 
 export const router = createBrowserRouter([
   {
-    path: "",
-    element: <Layout />,
+    path: "/",
+    element: <LandingPage />,
+  },
+  {
+    path: "/projects",
+    element: <ProtectedRoute />,
     children: [
       {
-        path: "/",
-        element: <LandingPage />,
-      },
-      {
-        path: "/projects",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            path: "",
-            element: <Projects />,
-          },
-        ],
-      },
-      {
-        path: "/dashboard",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            path: "",
-            element: <Dashboard />,
-          },
-          {
-            path: "users",
-            element: <AllUsersPage />,
-          },
-        ],
-      },
-      {
-        path: "/profile",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            path: "",
-            element: <ProfilePage />,
-          },
-          {
-            path: "edit",
-            element: <EditProfilePage />,
-          },
-        ],
-      },
-      {
-        path: "/contact",
-        element: <Contact />,
-      },
-      {
-        path: "/login",
-        element: <LogIn />,
-      },
-      {
-        path: "/register",
-        element: <Register />,
+        path: "",
+        element: <Projects />,
       },
     ],
+  },
+  {
+    path: "/dashboard",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "",
+        element: <Dashboard />,
+      },
+      {
+        path: "users",
+        element: <AllUsersPage />,
+      },
+    ],
+  },
+  {
+    path: "/profile",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "",
+        element: <ProfilePage />,
+      },
+      {
+        path: "edit",
+        element: <EditProfilePage />,
+      },
+    ],
+  },
+  {
+    path: "/contact",
+    element: <Contact />,
+  },
+  {
+    path: "/login",
+    element: <LogIn />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/about",
+    element: <About />,
   },
 ]);

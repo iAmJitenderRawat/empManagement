@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -19,9 +20,17 @@ app.use(express.json({ limit: "15kb" }));
 app.use(express.urlencoded({ limit: "15kb", extended: true }));
 app.use(cookieParser());
 
+// // Serve static files from the React app's build directory
+// app.use(express.static(path.join(__dirname, '../')));
+
+// // Handle all routes and serve index.html
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+// });
+
 //import routes
-import userRoutes from "./src/routes/user.route.js";
-import adminRoutes from "./src/routes/admin.route.js";
+import userRoutes from "./routes/user.route.js";
+import adminRoutes from "./routes/admin.route.js";
 
 //route
 app.use("/api/user", userRoutes);

@@ -11,12 +11,9 @@ import Dashboard from "./containers/Dashboard/Dashboard";
 import Contact from "./containers/Contact/Contact";
 import AllUsersPage from "./containers/Dashboard/AllUsersPage";
 import About from "./containers/About/About";
+import App from "./App";
 
 export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <LandingPage />,
-  },
   {
     path: "/login",
     element: <LogIn />,
@@ -26,11 +23,53 @@ export const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/about",
-    element: <About />,
-  },
-  {
-    path: "/contact",
-    element: <Contact />,
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        path: "",
+        element: <App />,
+      },
+      {
+        path: "dashboard",
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "",
+            element: <Dashboard />,
+          },
+          {
+            path: "users",
+            element: <AllUsersPage />,
+          },
+          {
+            path: "projects",
+            element: <Projects />,
+          }
+        ],
+      },
+      {
+        path: "profile",
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "",
+            element: <ProfilePage />,
+          },
+          {
+            path: "edit",
+            element: <EditProfilePage />,
+          },
+        ],
+      },
+      {
+        path: "contact",
+        element: <Contact />,
+      },
+      {
+        path: "about",
+        element: <About />,
+      }
+    ],
   },
 ]);

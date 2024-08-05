@@ -29,11 +29,13 @@ const Dashboard = () => {
           <Link to={"users"}>
             <DashboardCard icon={ImUsers} label="Users" value={totalUsers} />
           </Link>
+          <Link to={"projects"}>
           <DashboardCard
             icon={AiOutlineProject}
             label="Projects"
             value={totalPages}
-          />
+            />
+            </Link>
         </SimpleGrid>
       </Box>
     </main>

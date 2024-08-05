@@ -18,50 +18,9 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        index: true,
+        index:true,
         path: "",
         element: <LandingPage />,
-      },
-      {
-        path: "projects",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            index: true,
-            path: "",
-            element: <Projects />,
-          },
-        ],
-      },
-      {
-        path: "dashboard",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            index: true,
-            path: "",
-            element: <Dashboard />,
-          },
-          {
-            path: "users",
-            element: <AllUsersPage />,
-          },
-        ],
-      },
-      {
-        path: "profile",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            index: true,
-            path: "",
-            element: <ProfilePage />,
-          },
-          {
-            path: "edit",
-            element: <EditProfilePage />,
-          },
-        ],
       },
       {
         path: "contact",
@@ -78,6 +37,46 @@ export const router = createBrowserRouter([
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "projects",
+        element: (
+          <ProtectedRoute>
+            <Projects />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: "projects",
+            element: <Projects />,
+          },
+          {
+            path: "users",
+            element: <AllUsersPage />,
+          },
+        ],
+      },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: "edit",
+            element: <EditProfilePage />,
+          },
+        ],
       },
     ],
   },

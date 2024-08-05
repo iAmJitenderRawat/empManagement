@@ -66,7 +66,13 @@ export default function Topbar({ user }) {
 
   return (
     <>
-      <Box bg={useColorModeValue("gray.100", "gray.900")} px={4} pos={"sticky"} top={0} zIndex={99}>
+      <Box
+        bg={useColorModeValue("gray.100", "gray.900")}
+        px={4}
+        pos={"sticky"}
+        top={0}
+        zIndex={99}
+      >
         <Flex h={20} alignItems={"center"} justifyContent={"space-between"}>
           <IconButton
             size={"md"}
@@ -90,7 +96,8 @@ export default function Topbar({ user }) {
               {user?.userRole === "admin" && (
                 <>
                   <NavLink to={"/dashboard"}>Dashboard</NavLink>
-                  <NavLink to={"/projects"}>Projects</NavLink>
+                  <NavLink to={"/dashboard/users"}>Users</NavLink>
+                  <NavLink to={"/dashboard/projects"}>Projects</NavLink>
                 </>
               )}
             </HStack>
@@ -146,7 +153,8 @@ export default function Topbar({ user }) {
               {user?.userRole === "admin" && (
                 <>
                   <NavLink to={"/dashboard"}>Dashboard</NavLink>
-                  <NavLink to={"/projects"}>Projects</NavLink>
+                  <NavLink to={"/dashboard/users"}>Users</NavLink>
+                  <NavLink to={"/dashboard/projects"}>Projects</NavLink>
                 </>
               )}
             </Stack>

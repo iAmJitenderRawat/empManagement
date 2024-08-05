@@ -14,11 +14,11 @@ import About from "./containers/About/About";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: "",
     element: <LandingPage />,
   },
   {
-    path: "/projects",
+    path: "projects",
     element: <ProtectedRoute />,
     children: [
       {
@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/dashboard",
+    path: "dashboard",
     element: <ProtectedRoute />,
     children: [
       {
@@ -42,7 +42,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/profile",
+    path: "profile",
     element: <ProtectedRoute />,
     children: [
       {
@@ -56,19 +56,19 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/contact",
+    path: "contact",
     element: <Contact />,
   },
   {
-    path: "/login",
+    path: "login",
     element: <LogIn />,
   },
   {
-    path: "/register",
+    path: "register",
     element: <Register />,
   },
   {
-    path: "/about",
+    path: "about",
     element: <About />,
   },
 ]);

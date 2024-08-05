@@ -84,7 +84,7 @@ export default function Topbar({ user }) {
               spacing={4}
               display={{ base: "none", md: "flex" }}
             >
-              <NavLink to={"#"}>About</NavLink>
+              <NavLink to={"/about"}>About</NavLink>
               <NavLink to={"/contact"}>Contact</NavLink>
               <NavLink to={"/profile"}>Profile</NavLink>
               {user?.userRole === "admin" && (
@@ -140,7 +140,7 @@ export default function Topbar({ user }) {
         {isOpen ? (
           <Box ref={menuRef} pb={4} display={{ md: "none" }}>
             <Stack as={"nav"} spacing={4}>
-              <NavLink to={"#"}>About</NavLink>
+              <NavLink to={"/about"}>About</NavLink>
               <NavLink to={"/contact"}>Contact</NavLink>
               <NavLink to={"/profile"}>Profile</NavLink>
               {user?.userRole === "admin" && (

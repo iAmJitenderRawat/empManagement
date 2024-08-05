@@ -15,7 +15,6 @@ export default function LandingPage() {
           textAlign={"center"}
           fontSize={40}
           fontWeight={700}
-          color={useColorModeValue("white", "gray.400")}
         >
           Welcome to "E Manager"
         </Heading>

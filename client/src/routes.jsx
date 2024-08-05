@@ -21,15 +21,15 @@ export const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/",
+    path: "",
     element: <Layout />,
     children: [
       {
-        path: "",
+        path: "/",
         element: <LandingPage />,
       },
       {
-        path: "projects",
+        path: "/projects",
         element: <ProtectedRoute />,
         children: [
           {
@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "dashboard",
+        path: "/dashboard",
         element: <ProtectedRoute />,
         children: [
           {
@@ -53,7 +53,7 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "profile",
+        path: "/profile",
         element: <ProtectedRoute />,
         children: [
           {
@@ -67,7 +67,7 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "contact",
+        path: "/contact",
         element: <Contact />,
       },
     ],

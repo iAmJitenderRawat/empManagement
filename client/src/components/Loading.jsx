@@ -1,7 +1,7 @@
 // Loading.js
 import React from "react";
 import "./../App.css";
-import { Box } from "@chakra-ui/react";
+import { Box, useColorModeValue } from "@chakra-ui/react";
 
 const Loading = () => {
   return (
@@ -12,7 +12,10 @@ const Loading = () => {
       alignItems="center"
       height="100vh"
     >
-      <Box className="loadingio-spinner-pulse-2by998twmg8">
+      <Box
+        bg={useColorModeValue("white", "gray.800")}
+        className="loadingio-spinner-pulse-2by998twmg8"
+      >
         <Box className="ldio-yzaezf3dcmj">
           <Box></Box>
           <Box></Box>

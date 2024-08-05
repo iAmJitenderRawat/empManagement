@@ -24,10 +24,10 @@ const Dashboard = () => {
           Dashboard
         </Heading>
       </Center>
-      <Box p={5}>
-        <SimpleGrid columns={{ sm: 1, md: 2 }} spacing={10}>
+      <Box m={{ base: 5, sm: 8, md: 12, lg: 20, xl: 50 }}>
+        <SimpleGrid columns={{ base: 1, sm: 2 }} gap={10}>
           <Link to={"users"}>
-          <DashboardCard icon={ImUsers} label="Users" value={totalUsers} />
+            <DashboardCard icon={ImUsers} label="Users" value={totalUsers} />
           </Link>
           <DashboardCard
             icon={AiOutlineProject}

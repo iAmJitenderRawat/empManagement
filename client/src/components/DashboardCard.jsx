@@ -9,6 +9,8 @@ const DashboardCard = ({ icon, label, value }) => {
       borderRadius="md"
       bg="white"
       textAlign="center"
+      w={{ base: 200, sm: 220, md: 300, lg: 350, xl: 400 }}
+      m={"auto"}
     >
       <VStack spacing={4}>
         <Icon as={icon} w={10} h={10} color="teal.500" />

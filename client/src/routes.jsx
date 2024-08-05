@@ -13,14 +13,6 @@ import AllUsersPage from "./containers/Dashboard/AllUsersPage";
 
 export const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <LogIn />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  {
     path: "",
     element: <Layout />,
     children: [
@@ -69,6 +61,14 @@ export const router = createBrowserRouter([
       {
         path: "/contact",
         element: <Contact />,
+      },
+      {
+        path: "/login",
+        element: <LogIn />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
       },
     ],
   },

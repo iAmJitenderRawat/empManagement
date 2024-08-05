@@ -9,10 +9,13 @@ import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { data, isLoading, isError } = useGetAllUsersQuery();
-  const { users, currentPage, totalUsers, totalPages } = data?.data ?? {};
-console.log('users', users)
+  const { totalUsers, totalPages } = data?.data ?? {};
+
   if (isLoading) {
     return <Loading />;
+  }
+  if(isError){
+    return <Error message={"Failed to load data."} />
   }
   return (
     <main>

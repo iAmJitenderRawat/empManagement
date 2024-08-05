@@ -1,4 +1,4 @@
-import { Box, Icon, Text, VStack } from "@chakra-ui/react";
+import { Box, Icon, Text, useColorModeValue, VStack } from "@chakra-ui/react";
 
 const DashboardCard = ({ icon, label, value }) => {
   return (
@@ -12,10 +12,18 @@ const DashboardCard = ({ icon, label, value }) => {
     >
       <VStack spacing={4}>
         <Icon as={icon} w={10} h={10} color="teal.500" />
-        <Text color={"Background"} fontSize="lg" fontWeight="bold">
+        <Text
+          color={useColorModeValue("gray.500", "gray.900")}
+          fontSize="lg"
+          fontWeight="bold"
+        >
           {label}
         </Text>
-        <Text color={"ButtonFace"} fontSize="2xl" fontWeight="bold">
+        <Text
+          color={useColorModeValue("gray.500", "gray.900")}
+          fontSize="2xl"
+          fontWeight="bold"
+        >
           {value}
         </Text>
       </VStack>

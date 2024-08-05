@@ -2,6 +2,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../features/authSlice";
 
+const limit = import.meta.env.VITE_LIMIT;
+
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
   credentials: "include",
@@ -41,9 +43,8 @@ export const adminApi = createApi({
   endpoints: (builder) => ({
     getAllUsers: builder.query({
       query: (page) => {
-        console.log("token333", page);
         return {
-          url: `/admin/users?page=${page}`,
+          url: `/admin/users?page=${page}&limit=${limit}`,
           method: "GET",
         };
       },
@@ -65,8 +66,8 @@ export const adminApi = createApi({
       invalidatesTags: ["getAllProjects"],
     }),
     getAllProjects: builder.query({
-      query: (token) => ({
-        url: "/admin/getAllProjects",
+      query: (page) => ({
+        url: `/admin/projects?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["getAllProjects"],

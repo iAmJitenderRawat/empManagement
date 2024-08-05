@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
-import LandingPage from "./containers/LandingPage";
+import LandingPage from "./containers/LandingPage/LandingPage";
 import LogIn from "./containers/Authentication/Login";
 import Register from "./containers/Authentication/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./containers/Profile/ProfilePage";
-import { EditProfilePage } from "./containers/Profile/EditProfilePage";
+import EditProfilePage from "./containers/Profile/EditProfilePage";
 import Layout from "./components/Layout";
 import Projects from "./containers/Projects/Projects";
 import Dashboard from "./containers/Dashboard/Dashboard";

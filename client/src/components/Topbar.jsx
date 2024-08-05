@@ -15,14 +15,16 @@ import {
   Stack,
   useToast,
   Image,
+  useColorMode,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../services/auth";
-import logo from "/eManager.png";
+import logo from "/logo.png";
 import { useEffect, useRef } from "react";
 
 export default function Topbar({ user }) {
+  const { colorMode, toggleColorMode } = useColorMode();
   const [logoutUser, { isLoading: logoutLoading }] = useLogoutMutation();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const menuRef = useRef();
@@ -64,8 +66,8 @@ export default function Topbar({ user }) {
 
   return (
     <>
-      <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
-        <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+      <Box bg={useColorModeValue("gray.100", "gray.900")} px={4} pos={"sticky"} top={0} zIndex={99}>
+        <Flex h={20} alignItems={"center"} justifyContent={"space-between"}>
           <IconButton
             size={"md"}
             icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
@@ -93,14 +95,16 @@ export default function Topbar({ user }) {
               )}
             </HStack>
           </HStack>
-          <Flex alignItems={"center"}>
+          <Flex minW={100} justify={"space-between"} alignItems={"center"}>
+            <Button onClick={toggleColorMode}>
+              {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+            </Button>
             <Menu>
               <MenuButton
                 as={Button}
                 rounded={"full"}
                 variant={"link"}
                 cursor={"pointer"}
-                minW={0}
               >
                 <Avatar size={"sm"} src={user?.avatar?.secure_url} />
               </MenuButton>

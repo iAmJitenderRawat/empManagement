@@ -9,7 +9,7 @@ router.route("/deleteUser").delete(verifyJWT, deleteUser);
 
 //projects
 router.route("/addProject").post(verifyJWT, addProject);
-router.route("/getAllProjects").get(verifyJWT, getAllProjects);
+router.route("/projects").get(verifyJWT, getAllProjects);
 router.route("/deleteProject").delete(verifyJWT, deleteProject);
 
 export default router;

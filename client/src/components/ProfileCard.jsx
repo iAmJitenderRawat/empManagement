@@ -7,6 +7,7 @@ const ProfileCard = ({user, children}) => {
     <Box
       maxW={"320px"}
       w={"full"}
+      m={"auto"}
       bg={useColorModeValue("white", "gray.900")}
       boxShadow={"2xl"}
       rounded={"lg"}

@@ -3,6 +3,7 @@ import Topbar from "./Topbar";
 import { Outlet } from "react-router-dom";
 import { useGetCurrentUserQuery } from "../services/profile";
 import Loading from "./Loading";
+import Footer from "./Footer";
 
 const Layout = () => {
   const { data, isLoading, isError } = useGetCurrentUserQuery();
@@ -15,6 +16,7 @@ const Layout = () => {
     <>
       <Topbar user={user} />
       <Outlet />
+      <Footer />
     </>
   );
 };

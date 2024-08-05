@@ -36,7 +36,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 8;
   const skip = (page - 1) * limit;
-  console.log('req?.query', req?.query)
+
   if (page < 1) {
     return res.status(400).json(new ApiError("Page can't be less than 1", 403));
   }
@@ -56,6 +56,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
           totalUsers,
           totalPages: Math.ceil(totalUsers / limit),
           currentPage: page,
+          limit,
         },
         "Users retrieved successfully",
         200
@@ -100,9 +101,19 @@ export const getAllProjects = asyncHandler(async (req, res) => {
     const projects = await Project.find().skip(skip).limit(limit);
     const totalProjects = await Project.countDocuments();
 
-    return res
-      .status(200)
-      .json(new ApiResponse({projects,totalProjects, totalPages:Math.ceil(totalProjects/limit),currentPage:page}, "Projects retrieved successfully", 200));
+    return res.status(200).json(
+      new ApiResponse(
+        {
+          projects,
+          totalProjects,
+          totalPages: Math.ceil(totalProjects / limit),
+          currentPage: page,
+          limit
+        },
+        "Projects retrieved successfully",
+        200
+      )
+    );
   } catch (error) {
     return res.status(400).json(new ApiError(error.message, 400));
   }

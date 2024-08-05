@@ -19,7 +19,7 @@ import {
 import ChangeOrUpdateAvatarModal from "../../components/ChangeOrUpdateAvatarModal";
 import TagWithCross from "../../components/TagWithCross";
 
-export const EditProfilePage = () => {
+const EditProfilePage = () => {
   const { data } = useGetCurrentUserQuery();
   const user = data?.data;
   const avatarUrl = user?.avatar?.secure_url;
@@ -173,3 +173,4 @@ export const EditProfilePage = () => {
     </main>
   );
 };
+export default EditProfilePage;

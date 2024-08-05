@@ -17,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
 import ProfileCard from "../../components/ProfileCard";
 
-
 export default function ProfilePage() {
   const { data, isLoading, isError } = useGetCurrentUserQuery();
 
@@ -33,9 +32,7 @@ export default function ProfilePage() {
 
   return (
     <main>
-      <Center>
-        <Heading>Profile</Heading>
-      </Center>
+      <Heading as={"h2"} mt={10} textAlign={"center"}>Profile</Heading>
       <Center py={6}>
         <ProfileCard
           user={user}

@@ -6,12 +6,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./containers/Profile/ProfilePage";
 import EditProfilePage from "./containers/Profile/EditProfilePage";
 import Layout from "./components/Layout";
-import Projects from "./containers/Projects/Projects";
 import Dashboard from "./containers/Dashboard/Dashboard";
 import Contact from "./containers/Contact/Contact";
-import AllUsersPage from "./containers/Dashboard/AllUsersPage";
 import About from "./containers/About/About";
-import App from "./App";
+import UsersPage from "./containers/Dashboard/Users/UsersPage";
+import ProjectsPage from "./containers/Dashboard/Projects/ProjectsPage";
 
 export const router = createBrowserRouter([
   {
@@ -28,7 +27,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <App />,
+        element: <LandingPage />,
       },
       {
         path: "dashboard",
@@ -40,11 +39,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "users",
-            element: <AllUsersPage />,
+            element: <UsersPage />,
           },
           {
             path: "projects",
-            element: <Projects />,
+            element: <ProjectsPage />,
           }
         ],
       },

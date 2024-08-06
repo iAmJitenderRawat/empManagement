@@ -42,7 +42,8 @@ export const adminApi = createApi({
   tagTypes: ["getAllUsers", "getAllProjects"],
   endpoints: (builder) => ({
     getAllUsers: builder.query({
-      query: (page) => {
+      query: (value) => {
+        const page=value ?? 1;
         return {
           url: `/admin/users?page=${page}&limit=${limit}`,
           method: "GET",

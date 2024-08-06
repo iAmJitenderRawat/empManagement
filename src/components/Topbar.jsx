@@ -22,8 +22,10 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../services/auth";
 import logo from "/logo.png";
 import { useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
-export default function Topbar({ user }) {
+export default function Topbar() {
+  const user = useSelector(state=>state?.auth?.currentUser) ?? {};
   const { colorMode, toggleColorMode } = useColorMode();
   const [logoutUser, { isLoading: logoutLoading }] = useLogoutMutation();
   const { isOpen, onOpen, onClose } = useDisclosure();

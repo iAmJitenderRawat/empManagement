@@ -26,6 +26,13 @@ app.use(cookieParser());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+//Serve static files from the React app's build directory
+app.use(express.static(path.join(__dirname, "./../dist")));
+
+// Handle all routes and serve index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, "./../dist", "index.html"));
+});
 
 //import routes
 import userRoutes from "./routes/user.route.js";
@@ -35,11 +42,4 @@ import adminRoutes from "./routes/admin.route.js";
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-//Serve static files from the React app's build directory
-app.use(express.static(path.join(__dirname, "./../dist")));
-
-// Handle all routes and serve index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, "./../dist", "index.html"));
-});
 export { app };

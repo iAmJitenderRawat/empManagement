@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useGetAllProjectsQuery } from "../../services/admin";
-import Loading from "../../components/Loading";
-import ErrorPage from "../../components/ErrorPage";
+import { useGetAllProjectsQuery } from "../../../services/admin";
+import Loading from "../../../components/Loading";
+import ErrorPage from "../../../components/ErrorPage";
 import { Flex, Heading, IconButton, Text } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import { MdGridView, MdViewList } from "react-icons/md";
@@ -10,7 +10,7 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
-const Projects = () => {
+const ProjectsPage = () => {
   const query = useQuery();
   const page = parseInt(query.get("page")) || 1;
   const { data, isLoading, isError } = useGetAllProjectsQuery(page);
@@ -49,4 +49,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default ProjectsPage;

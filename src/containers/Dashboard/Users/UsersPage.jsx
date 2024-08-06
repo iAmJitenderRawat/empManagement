@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDeleteUserMutation, useGetAllUsersQuery } from "../../services/admin";
+import { useDeleteUserMutation, useGetAllUsersQuery } from "../../../services/admin";
 import {
   Avatar,
   Box,
@@ -21,10 +21,10 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import ProfileCard from "../../components/ProfileCard";
+import ProfileCard from "../../../components/ProfileCard";
 import { useLocation } from "react-router-dom";
-import Loading from "../../components/Loading";
-import Pagination from "../../components/Pagination";
+import Loading from "../../../components/Loading";
+import Pagination from "../../../components/Pagination";
 import { DeleteIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdViewList, MdGridView } from "react-icons/md";
 
@@ -32,7 +32,7 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
-const AllUsersPage = () => {
+const UsersPage = () => {
   const query = useQuery();
   const page = parseInt(query.get("page")) || 1;
   const [view, setView] = useState(false);
@@ -205,4 +205,4 @@ const AllUsersPage = () => {
   );
 };
 
-export default AllUsersPage;
+export default UsersPage;

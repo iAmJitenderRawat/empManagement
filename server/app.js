@@ -20,13 +20,13 @@ app.use(express.json({ limit: "15kb" }));
 app.use(express.urlencoded({ limit: "15kb", extended: true }));
 app.use(cookieParser());
 
-// // Serve static files from the React app's build directory
-// app.use(express.static(path.join(__dirname, '../')));
+// Serve static files from the React app's build directory
+app.use(express.static(path.join(__dirname, "./../dist")));
 
-// // Handle all routes and serve index.html
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-// });
+// Handle all routes and serve index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, "./../dist", "index.html"));
+});
 
 //import routes
 import userRoutes from "./routes/user.route.js";

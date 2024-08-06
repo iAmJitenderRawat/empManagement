@@ -11,9 +11,7 @@ export const uploadOnCloudinary = async (localFilePath) => {
   });
 
   if (!localFilePath) {
-    return res
-      .status(400)
-      .json(new ApiError("Local file path is required", 400));
+    return {message:"Local file path is required", status:400};
   }
   // Upload an image
   try {

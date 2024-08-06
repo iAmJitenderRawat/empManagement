@@ -1,19 +1,22 @@
 import * as React from "react";
 
 // 1. import `ChakraProvider` component
-import { RouterProvider } from "react-router-dom";
-import { persistor, store } from "./store/store";
-import { router } from "./routes";
 import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
+import { persistor, store } from "./store/store";
+import { ChakraProvider } from "@chakra-ui/react";
+import { PersistGate } from "redux-persist/lib/integration/react";
+import { router } from "./routes";
+import { RouterProvider } from "react-router-dom";
 
 function App() {
   // 2. Wrap ChakraProvider at the root of your app
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-      <RouterProvider router={router} />
-      </PersistGate>
+      <ChakraProvider>
+        <PersistGate loading={null} persistor={persistor}>
+          <RouterProvider router={router} />
+        </PersistGate>
+      </ChakraProvider>
     </Provider>
   );
 }

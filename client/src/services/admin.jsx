@@ -2,6 +2,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../features/authSlice";
 
+const limit = import.meta.env.VITE_LIMIT;
+
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
   credentials: "include",
@@ -40,13 +42,13 @@ export const adminApi = createApi({
   tagTypes: ["getAllUsers", "getAllProjects"],
   endpoints: (builder) => ({
     getAllUsers: builder.query({
-      query: (token) => ({
-        url: "/admin/getAllUsers",
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }),
+      query: (value) => {
+        const page=value ?? 1;
+        return {
+          url: `/admin/users?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
       providesTags: ["getAllUsers"],
     }),
     deleteUser: builder.mutation({
@@ -65,12 +67,9 @@ export const adminApi = createApi({
       invalidatesTags: ["getAllProjects"],
     }),
     getAllProjects: builder.query({
-      query: (token) => ({
-        url: "/admin/getAllProjects",
+      query: (page) => ({
+        url: `/admin/projects?page=${page}&limit=${limit}`,
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       }),
       providesTags: ["getAllProjects"],
     }),
@@ -86,4 +85,10 @@ export const adminApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const {useGetAllUsersQuery,useDeleteUserMutation,useAddProjectMutation,useGetAllProjectsQuery,useDeleteProjectMutation} = adminApi;
+export const {
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
+  useAddProjectMutation,
+  useGetAllProjectsQuery,
+  useDeleteProjectMutation,
+} = adminApi;

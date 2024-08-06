@@ -15,17 +15,23 @@ import {
   Stack,
   useToast,
   Image,
+  useColorMode,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from "@chakra-ui/icons";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../services/auth";
-import logo from "/eManager.png"
+import logo from "/logo.png";
+import { useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
-export default function Topbar({ user }) {
+export default function Topbar() {
+  const user = useSelector(state=>state?.auth?.currentUser) ?? {};
+  const { colorMode, toggleColorMode } = useColorMode();
+  const [logoutUser, { isLoading: logoutLoading }] = useLogoutMutation();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const menuRef = useRef();
   const navigate = useNavigate();
   const toast = useToast();
-  const [logoutUser] = useLogoutMutation();
 
   const handleLogout = async () => {
     try {
@@ -48,10 +54,28 @@ export default function Topbar({ user }) {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuRef]);
+
   return (
     <>
-      <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
-        <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+      <Box
+        bg={useColorModeValue("gray.100", "gray.900")}
+        px={4}
+        pos={"sticky"}
+        top={0}
+        zIndex={99}
+      >
+        <Flex h={20} alignItems={"center"} justifyContent={"space-between"}>
           <IconButton
             size={"md"}
             icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
@@ -61,32 +85,35 @@ export default function Topbar({ user }) {
           />
           <HStack spacing={8} alignItems={"center"}>
             <Link to={"/"}>
-            <Image w={50} src={logo} alt={"logo"} />
+              <Image w={50} src={logo} alt={"logo"} />
             </Link>
             <HStack
               as={"nav"}
               spacing={4}
               display={{ base: "none", md: "flex" }}
             >
-              <NavLink to={"#"}>About</NavLink>
+              <NavLink to={"/about"}>About</NavLink>
               <NavLink to={"/contact"}>Contact</NavLink>
               <NavLink to={"/profile"}>Profile</NavLink>
               {user?.userRole === "admin" && (
                 <>
                   <NavLink to={"/dashboard"}>Dashboard</NavLink>
-                  <NavLink to={"/projects"}>Projects</NavLink>
+                  <NavLink to={"/dashboard/users"}>Users</NavLink>
+                  <NavLink to={"/dashboard/projects"}>Projects</NavLink>
                 </>
               )}
             </HStack>
           </HStack>
-          <Flex alignItems={"center"}>
+          <Flex minW={100} justify={"space-between"} alignItems={"center"}>
+            <Button onClick={toggleColorMode}>
+              {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+            </Button>
             <Menu>
               <MenuButton
                 as={Button}
                 rounded={"full"}
                 variant={"link"}
                 cursor={"pointer"}
-                minW={0}
               >
                 <Avatar size={"sm"} src={user?.avatar?.secure_url} />
               </MenuButton>
@@ -95,11 +122,17 @@ export default function Topbar({ user }) {
                   <MenuItem textTransform={"capitalize"}>
                     {user?.firstName} {user?.lastName}
                   </MenuItem>
-                  <MenuItem>
-                    {user?.email}
-                  </MenuItem>
+                  <MenuItem>{user?.email}</MenuItem>
                   <MenuDivider />
-                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                  <MenuItem>
+                    <Button
+                      onClick={handleLogout}
+                      isLoading={logoutLoading}
+                      loadingText="Loging out"
+                    >
+                      Logout
+                    </Button>
+                  </MenuItem>
                 </MenuList>
               ) : (
                 <MenuList>
@@ -114,15 +147,16 @@ export default function Topbar({ user }) {
         </Flex>
 
         {isOpen ? (
-          <Box pb={4} display={{ md: "none" }}>
+          <Box ref={menuRef} pb={4} display={{ md: "none" }}>
             <Stack as={"nav"} spacing={4}>
-              <NavLink to={"#"}>About</NavLink>
+              <NavLink to={"/about"}>About</NavLink>
               <NavLink to={"/contact"}>Contact</NavLink>
               <NavLink to={"/profile"}>Profile</NavLink>
               {user?.userRole === "admin" && (
                 <>
                   <NavLink to={"/dashboard"}>Dashboard</NavLink>
-                  <NavLink to={"/projects"}>Projects</NavLink>
+                  <NavLink to={"/dashboard/users"}>Users</NavLink>
+                  <NavLink to={"/dashboard/projects"}>Projects</NavLink>
                 </>
               )}
             </Stack>

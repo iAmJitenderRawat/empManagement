@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api":"https://e-manager-one.vercel.app/api"
-    }
-  }
+      "/api": "https://e-manager-26ng.onrender.com",
+    },
+  },
 });

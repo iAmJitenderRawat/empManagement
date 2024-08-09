@@ -33,18 +33,36 @@ export const addProject = asyncHandler(async (req, res) => {
 });
 
 export const getAllUsers = asyncHandler(async (req, res) => {
+  if (req.user.userRole !== "admin") {
+    return res.status(403).json(new ApiError("Access denied", 403));
+  }
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 8;
   const skip = (page - 1) * limit;
+  const gender = req?.query?.gender;
+  const search = req?.query?.search;
+  const sortField = req?.query?.sortField ?? "firstName";
+  const sortOrder = req?.query?.sortOrder ?? "asc";
 
+  const query = {};
+  console.log("req?.query", req?.query);
+  if (search) {
+    query.firstName = { $regex: search, $options: "i" };
+  }
+
+  if (gender) {
+    query.gender = gender;
+  }
+  const sortOptions = {};
+  sortOptions[sortField] = sortOrder === "asc" ? 1 : -1;
+  console.log("query", query);
+  console.log("sortOptions", sortOptions);
   if (page < 1) {
     return res.status(400).json(new ApiError("Page can't be less than 1", 403));
   }
   try {
-    if (req.user.userRole !== "admin") {
-      return res.status(403).json(new ApiError("Access denied", 403));
-    }
-    const users = await User.find()
+    const users = await User.find(query)
+      .sort(sortOptions)
       .select("-password -refreshToken")
       .skip(skip)
       .limit(limit);
@@ -108,7 +126,7 @@ export const getAllProjects = asyncHandler(async (req, res) => {
           totalProjects,
           totalPages: Math.ceil(totalProjects / limit),
           currentPage: page,
-          limit
+          limit,
         },
         "Projects retrieved successfully",
         200

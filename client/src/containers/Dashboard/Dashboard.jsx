@@ -1,5 +1,5 @@
 import React from "react";
-import { useGetAllUsersQuery } from "../../services/admin";
+import { useGetAllProjectsQuery, useGetAllUsersQuery } from "../../services/admin";
 import Loading from "../../components/Loading";
 import { Box, Center, Heading, SimpleGrid } from "@chakra-ui/react";
 import DashboardCard from "../../components/DashboardCard";; 
@@ -8,13 +8,23 @@ import { AiOutlineProject } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const { data, isLoading, isError } = useGetAllUsersQuery();
-  const { totalUsers, totalPages } = data?.data ?? {};
+  const {
+    data: users,
+    isLoading: isLoadingUsers,
+    isError: isErrorUsers,
+  } = useGetAllUsersQuery({page:1});
+  const { totalUsers } = users?.data ?? {};
+  const {
+    data: projects,
+    isLoading: isLoadingProjects,
+    isError: isErrorProjects,
+  } = useGetAllProjectsQuery();
+  const { totalProjects } = projects?.data ?? {};
 
-  if (isLoading) {
+  if (isLoadingUsers || isLoadingProjects) {
     return <Loading />;
   }
-  if(isError){
+  if(isErrorUsers||isErrorProjects){
     return <Error message={"Failed to load data."} />
   }
   return (
@@ -26,16 +36,16 @@ const Dashboard = () => {
       </Center>
       <Box m={{ base: 5, sm: 8, md: 12, lg: 20, xl: 50 }}>
         <SimpleGrid columns={{ base: 1, sm: 2 }} gap={10}>
-          <Link to={"users"}>
+          <Link to={"/dashboard/users?page=1"}>
             <DashboardCard icon={ImUsers} label="Users" value={totalUsers} />
           </Link>
-          <Link to={"projects"}>
-          <DashboardCard
-            icon={AiOutlineProject}
-            label="Projects"
-            value={totalPages}
+          <Link to={"/dashboard/projects?page=1"}>
+            <DashboardCard
+              icon={AiOutlineProject}
+              label="Projects"
+              value={totalProjects}
             />
-            </Link>
+          </Link>
         </SimpleGrid>
       </Box>
     </main>

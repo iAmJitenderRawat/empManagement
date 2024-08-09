@@ -1,36 +1,23 @@
 // ErrorPage.js
+import { Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import React from "react";
+import { getAvailableHeight } from "../utils/helperFunctions";
 // import { useHistory } from "react-router-dom";
 
 const ErrorPage = ({ message }) => {
 //   const history = useHistory();
+const height= getAvailableHeight();
+console.log(height)
 
   return (
-    <div style={styles.container}>
-      <h1>Something went wrong</h1>
-      <p>{message || "An unexpected error occurred."}</p>
+    <Flex height={height} justify={"center"} align={"center"} direction={"column"}>
+      <Heading as={"h2"} >ERROR</Heading>
+      <Text>{message || "An unexpected error occurred."}</Text>
       {/* <button onClick={() => history.push("/")} style={styles.button}>
         Go to Homepage
       </button> */}
-    </div>
+    </Flex>
   );
-};
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-    textAlign: "center",
-  },
-  button: {
-    marginTop: "20px",
-    padding: "10px 20px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
 };
 
 export default ErrorPage;

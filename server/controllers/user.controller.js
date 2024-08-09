@@ -24,6 +24,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     password,
     userRole = "user",
     secret,
+    gender,
   } = req.body;
 
   if (userRole === "admin") {
@@ -37,7 +38,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
   }
   // check all fields there or not
-  if (!firstName || !email || !password) {
+  if (!firstName || !email || !password || !gender) {
     return res
       .status(400)
       .json(new ApiError("Please fill all the fields", 400));
@@ -54,18 +55,13 @@ export const registerUser = asyncHandler(async (req, res) => {
     return res.status(409).json(new ApiError("User already exists", 409));
   }
 
-  // get avatarLocalPath
-  const avatarLocalPath = req?.file?.path;
-
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-
   const user = await User.create({
     firstName,
     lastName,
     email,
     password,
-    avatar,
     userRole,
+    gender,
   });
 
   if (!user._id) {
@@ -91,8 +87,8 @@ export const registerUser = asyncHandler(async (req, res) => {
           firstName,
           lastName,
           email,
-          avatar,
           userRole,
+          gender,
           accessToken,
           refreshToken,
         },
@@ -144,7 +140,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     userId,
     {
-      refreshToken: null,
+      $unset: { refreshToken: 1 },
     },
     {
       new: true,
@@ -173,13 +169,13 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   }
   try {
     const user = await User.findById(decoded._id).select("-password");
+    if (!user) {
+      return res.status(400).json(new ApiError("Invalid refresh token", 400));
+    }
     if (incomingRefreshToken !== user.refreshToken) {
       return res
         .status(400)
         .json(new ApiError("Refresh token is expired or used", 400));
-    }
-    if (!user) {
-      return res.status(400).json(new ApiError("Invalid refresh token", 400));
     }
     const { accessToken, refreshToken, message } =
       await generateAccessAndRefreshToken(user._id);
@@ -228,7 +224,7 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 export const updateUser = asyncHandler(async (req, res) => {
-  const { email, firstName, lastName, isAvaiable, bio, hobbies } = req.body;
+  const { email, firstName, lastName, isAvailable, bio, hobbies } = req.body;
 
   if (!(firstName && email)) {
     return res
@@ -250,7 +246,7 @@ export const updateUser = asyncHandler(async (req, res) => {
           firstName,
           lastName,
           email,
-          isAvaiable,
+          isAvailable,
           bio,
           hobbies,
         },

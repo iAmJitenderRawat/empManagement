@@ -64,11 +64,11 @@ const EditProfilePage = () => {
   return (
     <main>
       <Center
-        m={2}
         maxW={{ base: 250, sm: 350, md: 450, lg: 550 }}
-        margin={"auto"}
+        mx={"auto"}
+        my={10}
       >
-        <Stack mt={10}>
+        <Stack>
           <HStack justify={"space-between"} align={"center"}>
             <Box>
               <Avatar

@@ -27,13 +27,14 @@ export default function Register() {
     firstName: "",
     lastName: "",
     email: "",
+    gender:"",
     secret: "",
     userRole: "user",
     password: "",
   };
   const [formData, setFormData] = useState();
-
-  const [registerUser, { isLoading, isError, isSuccess, reset }] =
+console.log('formData', formData)
+  const [registerUser, { isLoading }] =
     useRegisterMutation();
   const toast = useToast();
   const navigate = useNavigate();
@@ -154,33 +155,45 @@ export default function Register() {
                   onChange={handleChange}
                   value={formData?.userRole}
                 >
+                  <option value="">Please select one</option>
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
                 </Select>
               </FormControl>
-              {formData?.userRole === "admin" && (
-                <FormControl id="secret" isRequired>
-                  <FormLabel>Secret</FormLabel>
-                  <InputGroup>
-                    <Input
-                      type={showSecret ? "text" : "password"}
-                      name="secret"
-                      onChange={handleChange}
-                    />
-                    <InputRightElement h={"full"}>
-                      <Button
-                        variant={"ghost"}
-                        onClick={() =>
-                          setShowSecret((showSecret) => !showSecret)
-                        }
-                      >
-                        {showSecret ? <ViewIcon /> : <ViewOffIcon />}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
-                </FormControl>
-              )}
+              <FormControl id="gender" isRequired>
+                <FormLabel>Gender</FormLabel>
+                <Select
+                  variant="outline"
+                  name="gender"
+                  onChange={handleChange}
+                  value={formData?.gender}
+                >
+                  <option value="">Please select one</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </Select>
+              </FormControl>
             </HStack>
+            {formData?.userRole === "admin" && (
+              <FormControl id="secret" isRequired>
+                <FormLabel>Secret</FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showSecret ? "text" : "password"}
+                    name="secret"
+                    onChange={handleChange}
+                  />
+                  <InputRightElement h={"full"}>
+                    <Button
+                      variant={"ghost"}
+                      onClick={() => setShowSecret((showSecret) => !showSecret)}
+                    >
+                      {showSecret ? <ViewIcon /> : <ViewOffIcon />}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+            )}
             <Stack spacing={10} pt={2}>
               <Button
                 loadingText="Submitting"
@@ -191,6 +204,7 @@ export default function Register() {
                 _hover={{
                   bg: "blue.500",
                 }}
+                isLoading={isLoading}
               >
                 Register
               </Button>

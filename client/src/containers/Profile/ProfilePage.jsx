@@ -18,14 +18,14 @@ import ChangePasswordModal from "../../components/ChangePasswordModal";
 import ProfileCard from "../../components/ProfileCard";
 
 export default function ProfilePage() {
-  const { data, isLoading, isError } = useGetCurrentUserQuery();
-
+  const { data, isLoading, isError, error } = useGetCurrentUserQuery();
+console.log('error', error)
   const navigate = useNavigate();
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
-    return <ErrorPage message="Failed to load data." />;
+    return <ErrorPage message={error.data.message} />;
   }
 
   const user = data?.data;

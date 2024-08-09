@@ -18,9 +18,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     );
     if (refreshResult.data) {
       // store the new token
-      api.dispatch(
-        api.dispatch(setCredentials(refreshResult.data.data))
-      );
+      api.dispatch(api.dispatch(setCredentials(refreshResult.data.data)));
       // retry the original query with new access token
       result = await baseQuery(args, api, extraOptions);
     } else {
@@ -42,7 +40,7 @@ export const profileApi = createApi({
         url: "/user/getCurrentUser",
         method: "GET",
       }),
-      providesTags: ["getCurrentUser","avatar"],
+      providesTags: ["getCurrentUser", "avatar"],
     }),
     //refresh access-token
     refreshAccessToken: builder.query({
@@ -87,4 +85,10 @@ export const profileApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useUploadAvatarMutation, useUpdateUserMutation, useChangePasswordMutation, useGetCurrentUserQuery, useLazyGetCurrentUserQuery } = profileApi;
+export const {
+  useUploadAvatarMutation,
+  useUpdateUserMutation,
+  useChangePasswordMutation,
+  useGetCurrentUserQuery,
+  useLazyRefreshAccessTokenQuery,
+} = profileApi;

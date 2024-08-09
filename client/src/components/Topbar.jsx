@@ -67,102 +67,109 @@ export default function Topbar() {
   }, [menuRef]);
 
   return (
-    <>
-      <Box
-        bg={useColorModeValue("gray.100", "gray.900")}
-        px={4}
-        pos={"sticky"}
-        top={0}
-        zIndex={99}
-      >
-        <Flex h={20} alignItems={"center"} justifyContent={"space-between"}>
-          <IconButton
-            size={"md"}
-            icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-            aria-label={"Open Menu"}
-            display={{ md: "none" }}
-            onClick={isOpen ? onClose : onOpen}
-          />
-          <HStack spacing={8} alignItems={"center"}>
-            <Link to={"/"}>
-              <Image w={50} src={logo} alt={"logo"} />
-            </Link>
-            <HStack
-              as={"nav"}
-              spacing={4}
-              display={{ base: "none", md: "flex" }}
-            >
-              <NavLink to={"/about"}>About</NavLink>
-              <NavLink to={"/contact"}>Contact</NavLink>
-              <NavLink to={"/profile"}>Profile</NavLink>
-              {user?.userRole === "admin" && (
-                <>
-                  <NavLink to={"/dashboard"}>Dashboard</NavLink>
-                  <NavLink to={"/dashboard/users"}>Users</NavLink>
-                  <NavLink to={"/dashboard/projects"}>Projects</NavLink>
-                </>
-              )}
-            </HStack>
+    <Box
+      id="topbar"
+      bg={useColorModeValue("gray.100", "gray.900")}
+      px={4}
+      pos={"sticky"}
+      top={0}
+      zIndex={99}
+    >
+      <Flex h={20} alignItems={"center"} justifyContent={"space-between"}>
+        <IconButton
+          size={"md"}
+          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+          aria-label={"Open Menu"}
+          display={{ md: "none" }}
+          onClick={isOpen ? onClose : onOpen}
+        />
+        <HStack spacing={8} alignItems={"center"}>
+          <Link to={"/"}>
+            <Image w={100} src={logo} alt={"logo"} />
+          </Link>
+          <HStack as={"nav"} spacing={4} display={{ base: "none", md: "flex" }}>
+            <NavLink to={"/about"}>About</NavLink>
+            <NavLink to={"/contact"}>Contact</NavLink>
+            <NavLink to={"/profile"}>Profile</NavLink>
+            {user?.userRole === "admin" && (
+              <>
+                <NavLink to={"/dashboard"}>Dashboard</NavLink>
+                <NavLink to={"/dashboard/users?page=1"}>Users</NavLink>
+                <NavLink to={"/dashboard/projects?page=1"}>Projects</NavLink>
+              </>
+            )}
           </HStack>
-          <Flex minW={100} justify={"space-between"} alignItems={"center"}>
-            <Button onClick={toggleColorMode}>
-              {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-            </Button>
-            <Menu>
-              <MenuButton
-                as={Button}
-                rounded={"full"}
-                variant={"link"}
-                cursor={"pointer"}
-              >
-                <Avatar size={"sm"} src={user?.avatar?.secure_url} />
-              </MenuButton>
-              {user?._id ? (
-                <MenuList>
-                  <MenuItem textTransform={"capitalize"}>
-                    {user?.firstName} {user?.lastName}
-                  </MenuItem>
-                  <MenuItem>{user?.email}</MenuItem>
-                  <MenuDivider />
-                  <MenuItem>
-                    <Button
-                      onClick={handleLogout}
-                      isLoading={logoutLoading}
-                      loadingText="Loging out"
-                    >
-                      Logout
-                    </Button>
-                  </MenuItem>
-                </MenuList>
-              ) : (
-                <MenuList>
-                  <MenuItem onClick={() => navigate("/register")}>
-                    Register
-                  </MenuItem>
-                  <MenuItem onClick={() => navigate("/login")}>Login</MenuItem>
-                </MenuList>
-              )}
-            </Menu>
-          </Flex>
+        </HStack>
+        <Flex minW={100} justify={"space-between"} alignItems={"center"}>
+          <Button onClick={toggleColorMode}>
+            {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+          </Button>
+          <Menu>
+            <MenuButton
+              as={Button}
+              rounded={"full"}
+              variant={"link"}
+              cursor={"pointer"}
+            >
+              <Avatar size={"sm"} src={user?.avatar?.secure_url} />
+            </MenuButton>
+            {user?._id ? (
+              <MenuList>
+                <MenuItem textTransform={"capitalize"}>
+                  {user?.firstName} {user?.lastName}
+                </MenuItem>
+                <MenuItem>{user?.email}</MenuItem>
+                <MenuDivider />
+                <MenuItem>
+                  <Button
+                    onClick={handleLogout}
+                    isLoading={logoutLoading}
+                    loadingText="Loging out"
+                  >
+                    Logout
+                  </Button>
+                </MenuItem>
+              </MenuList>
+            ) : (
+              <MenuList>
+                <MenuItem onClick={() => navigate("/register")}>
+                  Register
+                </MenuItem>
+                <MenuItem onClick={() => navigate("/login")}>Login</MenuItem>
+              </MenuList>
+            )}
+          </Menu>
         </Flex>
+      </Flex>
 
-        {isOpen ? (
-          <Box ref={menuRef} pb={4} display={{ md: "none" }}>
-            <Stack as={"nav"} spacing={4}>
-              <NavLink to={"/about"}>About</NavLink>
-              <NavLink to={"/contact"}>Contact</NavLink>
-              <NavLink to={"/profile"}>Profile</NavLink>
-              {user?.userRole === "admin" && (
-                <>
-                  <NavLink to={"/dashboard"}>Dashboard</NavLink>
-                  <NavLink to={"/dashboard/users"}>Users</NavLink>
-                  <NavLink to={"/dashboard/projects"}>Projects</NavLink>
-                </>
-              )}
-            </Stack>
-          </Box>
-        ) : null}
-      </Box>
-    </>
+      {isOpen ? (
+        <Box ref={menuRef} pb={4} display={{ md: "none" }}>
+          <Stack as={"nav"} spacing={4}>
+            <NavLink onClick={onClose} to={"/about"}>
+              About
+            </NavLink>
+            <NavLink onClick={onClose} to={"/contact"}>
+              Contact
+            </NavLink>
+            <NavLink onClick={onClose} to={"/profile"}>
+              Profile
+            </NavLink>
+            {user?.userRole === "admin" && (
+              <>
+                <NavLink onClick={onClose} to={"/dashboard"}>
+                  Dashboard
+                </NavLink>
+                <NavLink onClick={onClose} to={"/dashboard/users"}>
+                  Users
+                </NavLink>
+                <NavLink onClick={onClose} to={"/dashboard/projects"}>
+                  Projects
+                </NavLink>
+              </>
+            )}
+          </Stack>
+        </Box>
+      ) : null}
+    </Box>
   );
 }

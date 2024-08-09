@@ -21,6 +21,11 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+      required: [true, "Gender is required"],
+    },
     avatar: {
       secure_url: String,
       public_id: String,
@@ -34,23 +39,23 @@ const userSchema = new Schema(
     refreshToken: {
       type: String,
     },
-    isAvaiable: {
+    isAvailable: {
       type: Boolean,
       default: true,
     },
-    userRole:{
+    userRole: {
       type: String,
       enum: ["admin", "user"],
-      default: "user"
+      default: "user",
     },
-    bio:{
+    bio: {
       type: String,
-      trim: true
+      trim: true,
     },
-    hobbies:{
+    hobbies: {
       type: [String],
-      trim:true,
-    }
+      trim: true,
+    },
   },
   { timestamps: true }
 );

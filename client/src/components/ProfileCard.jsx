@@ -1,8 +1,19 @@
-import { Avatar, Badge, Box, Button, Flex, Heading, Stack, Text, useColorModeValue } from '@chakra-ui/react';
-import React from 'react'
-import ChangePasswordModal from './ChangePasswordModal';
+import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Stack,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import React from "react";
+import moment from "moment";
 
-const ProfileCard = ({user, children}) => {
+const ProfileCard = ({ user, children }) => {
+  const bgColor = user?.isAvailable ? "green.300" : "red.500";
   return (
     <Box
       maxW={"320px"}
@@ -23,7 +34,7 @@ const ProfileCard = ({user, children}) => {
           content: '""',
           w: 4,
           h: 4,
-          bg: "green.300",
+          bg: bgColor,
           border: "2px solid white",
           rounded: "full",
           pos: "absolute",
@@ -48,30 +59,60 @@ const ProfileCard = ({user, children}) => {
       >
         {user?.bio}
       </Text>
-      {user?.hobbies?.length > 0 && <Text color={"blue.400"}>Hobbies</Text>}
+      <Text
+        textAlign={"center"}
+        color={useColorModeValue("gray.700", "gray.400")}
+        px={3}
+      >
+        {user?.gender}
+      </Text>
+      <Text
+        textAlign={"center"}
+        color={useColorModeValue("gray.700", "gray.400")}
+        px={3}
+      >
+        <Text as={"span"} color={"blue.400"}>
+          Joined in{" "}
+        </Text>
+        {moment(user?.createdAt).format("L")}
+      </Text>
+      <Text color={"blue.400"}>Hobbies</Text>
       <Flex
         flexWrap={"wrap"}
         align={"center"}
         justify={"center"}
         direction={"row"}
-        mt={1}
+        my={2}
+        gap={2}
       >
-        {user?.hobbies?.length > 0 &&
+        {user?.hobbies?.length > 0 ? (
           user?.hobbies?.map((hobby, i) => (
             <Badge
               key={i + hobby}
               px={2}
               py={1}
-              bg={useColorModeValue("gray.50", "gray.800")}
+              color={"black"}
+              bg={"greenyellow"}
               fontWeight={"400"}
             >
               #{hobby}
             </Badge>
-          ))}
+          ))
+        ) : (
+          <Badge
+            px={2}
+            py={1}
+            color={"black"}
+            bg={"greenyellow"}
+            fontWeight={"400"}
+          >
+            #NO HOBBIES
+          </Badge>
+        )}
       </Flex>
       {children}
     </Box>
   );
-}
+};
 
-export default ProfileCard
+export default ProfileCard;

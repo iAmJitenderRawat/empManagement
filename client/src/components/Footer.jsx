@@ -39,6 +39,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   return (
     <Box
+    id="footer"
       bg={useColorModeValue("gray.50", "gray.900")}
       color={useColorModeValue("gray.700", "gray.200")}
     >

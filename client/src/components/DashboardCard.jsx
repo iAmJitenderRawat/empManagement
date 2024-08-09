@@ -7,23 +7,23 @@ const DashboardCard = ({ icon, label, value }) => {
       shadow="md"
       borderWidth="1px"
       borderRadius="md"
-      bg="white"
+      bg={useColorModeValue("gray.300","gray.900")}
       textAlign="center"
       w={{ base: 200, sm: 220, md: 300, lg: 350, xl: 400 }}
       m={"auto"}
     >
       <VStack spacing={4}>
-        <Icon as={icon} w={10} h={10} color="teal.500" />
+        <Icon as={icon} w={100} h={100} color="orange.500" />
         <Text
-          color={useColorModeValue("gray.500", "gray.900")}
-          fontSize="lg"
+          color={useColorModeValue("gray.900", "gray.400")}
+          fontSize={"xx-large"}
           fontWeight="bold"
         >
           {label}
         </Text>
         <Text
-          color={useColorModeValue("gray.500", "gray.900")}
-          fontSize="2xl"
+          color={useColorModeValue("gray.900", "gray.400")}
+          fontSize={"xx-large"}
           fontWeight="bold"
         >
           {value}

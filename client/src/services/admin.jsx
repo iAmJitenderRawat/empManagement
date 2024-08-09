@@ -42,11 +42,13 @@ export const adminApi = createApi({
   tagTypes: ["getAllUsers", "getAllProjects"],
   endpoints: (builder) => ({
     getAllUsers: builder.query({
-      query: (value) => {
-        const page=value ?? 1;
+      query: (queryParams) => {
+        const { page, gender, search, sortField, sortOrder } = queryParams;
+        console.log("queryParams1", queryParams);
         return {
-          url: `/admin/users?page=${page}&limit=${limit}`,
+          url: "/admin/users",
           method: "GET",
+          params: { page, gender, search, sortField, sortOrder },
         };
       },
       providesTags: ["getAllUsers"],
@@ -67,10 +69,13 @@ export const adminApi = createApi({
       invalidatesTags: ["getAllProjects"],
     }),
     getAllProjects: builder.query({
-      query: (page) => ({
-        url: `/admin/projects?page=${page}&limit=${limit}`,
-        method: "GET",
-      }),
+      query: (value) => {
+        const page = value ?? 1;
+        return {
+          url: `/admin/projects?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
       providesTags: ["getAllProjects"],
     }),
     deleteProject: builder.mutation({

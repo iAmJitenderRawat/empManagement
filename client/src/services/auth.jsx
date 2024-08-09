@@ -6,10 +6,36 @@ const baseQuery = fetchBaseQuery({
   credentials: "include",
 });
 
+const baseQueryWithReauth = async (args, api, extraOptions) => {
+  let result = await baseQuery(args, api, extraOptions);
+  if (result.error && result.error.status === 401) {
+    // try to get a new token
+    const refreshResult = await baseQuery(
+      "/user/refreshAccessToken",
+      api,
+      extraOptions
+    );
+    if (refreshResult.data) {
+      // store the new token
+      api.dispatch(
+        authApi.util.updateQueryData("refreshToken", undefined, (draft) => {
+          draft.accessToken = refreshResult.data.accessToken;
+        })
+      );
+      // retry the original query with new access token
+      result = await baseQuery(args, api, extraOptions);
+    } else {
+      api.dispatch(logout());
+    }
+  }
+
+  return result;
+};
+
 // Define a service using a base URL and expected endpoints
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["getCurrentUser"],
   endpoints: (builder) => ({
     login: builder.mutation({
@@ -40,8 +66,5 @@ export const authApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const {
-  useRegisterMutation,
-  useLoginMutation,
-  useLogoutMutation,
-} = authApi;
+export const { useRegisterMutation, useLoginMutation, useLogoutMutation } =
+  authApi;

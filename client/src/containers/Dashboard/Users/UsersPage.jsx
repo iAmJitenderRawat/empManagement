@@ -35,12 +35,13 @@ import ProfileCard from "../../../components/ProfileCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loading from "../../../components/Loading";
 import Pagination from "../../../components/Pagination";
-import { DeleteIcon, ViewIcon } from "@chakra-ui/icons";
+import { DeleteIcon, SearchIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdViewList, MdGridView } from "react-icons/md";
 import {
   AiOutlineSortAscending,
   AiOutlineSortDescending,
 } from "react-icons/ai";
+import qs from "query-string";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -49,30 +50,29 @@ const useQuery = () => {
 const UsersPage = () => {
   const height = getAvailableHeight();
   const query = useQuery();
+  const location = useLocation();
   const navigate = useNavigate();
   const page = parseInt(query.get("page")) || 1;
-  // const gender = query.get("gender") ?? "";
-  const [gender, setGender] = useState("");
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [sortField, setSortField] = useState("firstName");
-  const [sortOrder, setSortOrder] = useState("asc");
   const [view, setView] = useState(false);
+  const { data, isLoading, isError } = useGetAllUsersQuery(
+    qs.parse(location.search)
+  );
   const qp = {
     page,
-    search: debouncedSearch,
-    gender,
-    sortField,
-    sortOrder,
+    sortField: "firstName",
+    sortOrder: "asc",
+    search:"",
+    gender:"",
   };
-
-  const { data, isLoading, isError } = useGetAllUsersQuery(qp);
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      setDebouncedSearch(search);
+  const [queryParams, setQueryParams] = useState(qp);
+  useEffect(()=>{
+   const id= setTimeout(() => {
+      navigate(`?search=${search}`)
     }, 500);
-    return () => clearTimeout(timerId);
-  }, [search]);
+    return ()=> clearTimeout(id)
+  },[])
+
   const [deleteUser, { isLoading: deleteUserLoading }] =
     useDeleteUserMutation();
   const { users, limit, totalPages, totalUsers } = data?.data ?? {};
@@ -119,11 +119,30 @@ const UsersPage = () => {
           <Flex gap={5} justify={"center"} align={"center"}>
             <Input
               type="text"
+              name="search"
               placeholder="Search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <Button onClick={() => setSearch("")}>Clear</Button>
+            <IconButton
+              icon={<SearchIcon />}
+              onClick={() => {
+                const currentParams = qs.parse(location.search);
+                const params = { ...currentParams, search };
+                const url = buildSearchQuery(params);
+                navigate(`?${url}`);
+              }}
+            />
+            <Button
+              onClick={() => {
+                const currentParams = qs.parse(location.search);
+                const params = { ...currentParams, search: "" };
+                const url = buildSearchQuery(params);
+                navigate(`?${url}`);
+              }}
+            >
+              Clear
+            </Button>
           </Flex>
         </Flex>
         <Flex
@@ -137,30 +156,57 @@ const UsersPage = () => {
           </Heading>
           <Flex justify={"center"} align={"center"} gap={5}>
             <Select
-              value={sortField}
-              onChange={(e) => setSortField(e.target.value)}
+              name="sortField"
+              value={queryParams?.sortField}
+              onChange={(e) =>{
+                setQueryParams({ ...queryParams, sortField: e.target.value })
+                console.log('e.target.value', e.target.value)
+              }}
             >
               <option value="firstName">Name</option>
               <option value="createdAt">Joining Date</option>
             </Select>
-            <Select value={gender} onChange={(e) => setGender(e.target.value)}>
+
+            <Select
+              name="gender"
+              value={queryParams?.gender}
+              onChange={(e) =>
+                setQueryParams({ ...queryParams, gender: e.target.value })
+              }
+            >
               <option value="">Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
             </Select>
             <Flex>
               <IconButton
-                onClick={() => setSortOrder("asc")}
-                isDisabled={sortOrder === "asc"}
+                onClick={() =>
+                  setQueryParams({ ...queryParams, sortOrder: "asc" })
+                }
+                isDisabled={queryParams?.sortOrder === "asc"}
                 icon={<AiOutlineSortAscending />}
               />
               <IconButton
-                onClick={() => setSortOrder("desc")}
-                isDisabled={sortOrder === "desc"}
+                onClick={() =>
+                  setQueryParams({ ...queryParams, sortOrder: "desc" })
+                }
+                isDisabled={queryParams?.sortOrder === "desc"}
                 icon={<AiOutlineSortDescending />}
               />
             </Flex>
           </Flex>
+          <Button
+            onClick={() => {
+              const currentParams = qs.parse(location.search);
+              console.log("currentParams", currentParams);
+              const params = { ...currentParams, ...queryParams };
+              console.log("queryParams", queryParams);
+              const url = buildSearchQuery(params);
+              navigate(`?${url}`);
+            }}
+          >
+            Filter
+          </Button>
           <Button onClick={() => navigate("?page=1")}>Reset Filter</Button>
         </Flex>
       </Flex>

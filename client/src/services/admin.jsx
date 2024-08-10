@@ -1,6 +1,7 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout } from "../features/authSlice";
+import { logout, setCredentials } from "../features/authSlice";
+import { authApi } from "./auth";
 
 const limit = import.meta.env.VITE_LIMIT;
 
@@ -18,17 +19,15 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
+    console.log('api', api)
     if (refreshResult.data) {
       // store the new token
-      api.dispatch(
-        authApi.util.updateQueryData("refreshToken", undefined, (draft) => {
-          draft.accessToken = refreshResult.data.accessToken;
-        })
-      );
+      api.dispatch(setCredentials(refreshResult.data.data));
       // retry the original query with new access token
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());
+      console.log("first")
     }
   }
 
@@ -44,7 +43,6 @@ export const adminApi = createApi({
     getAllUsers: builder.query({
       query: (queryParams) => {
         const { page, gender, search, sortField, sortOrder } = queryParams;
-        console.log("queryParams1", queryParams);
         return {
           url: "/admin/users",
           method: "GET",
@@ -54,10 +52,12 @@ export const adminApi = createApi({
       providesTags: ["getAllUsers"],
     }),
     deleteUser: builder.mutation({
-      query: () => ({
-        url: "/admin/deleteUser",
-        method: "DELETE",
-      }),
+      query: (id) => {
+        return {
+          url: `/admin/deleteUser/${id}`,
+          method: "DELETE",
+        };
+      },
       invalidatesTags: ["getAllUsers"],
     }),
     addProject: builder.mutation({

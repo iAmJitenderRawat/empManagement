@@ -7,15 +7,11 @@ import { getAvailableHeight } from "../utils/helperFunctions";
 const ErrorPage = ({ message }) => {
 //   const history = useHistory();
 const height= getAvailableHeight();
-console.log(height)
 
   return (
     <Flex height={height} justify={"center"} align={"center"} direction={"column"}>
       <Heading as={"h2"} >ERROR</Heading>
       <Text>{message || "An unexpected error occurred."}</Text>
-      {/* <button onClick={() => history.push("/")} style={styles.button}>
-        Go to Homepage
-      </button> */}
     </Flex>
   );
 };

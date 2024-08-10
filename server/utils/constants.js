@@ -4,7 +4,7 @@ export const accessCookieOptions = {
   httpOnly: true,
   secure: true,
   maxAge: process.env.ACCESS_TOKEN_MAX_AGE,
-  sameSite: process.env.SAME_SITE,
+  sameSite: "none",
 };
 
 export const refreshCookieOptions = {

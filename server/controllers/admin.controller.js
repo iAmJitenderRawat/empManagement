@@ -91,11 +91,12 @@ export const deleteUser = asyncHandler(async (req, res) => {
       return res.status(403).json(new ApiError("Access denied", 403));
     }
     const id = req.params.id;
+    console.log('id', id)
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json(new ApiError("User not found", 404));
     }
-    await user.remove();
+    await User.findByIdAndDelete(id);
     return res
       .status(200)
       .json(new ApiResponse({}, "User deleted successfully", 200));

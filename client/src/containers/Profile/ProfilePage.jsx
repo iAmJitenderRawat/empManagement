@@ -19,14 +19,14 @@ import ProfileCard from "../../components/ProfileCard";
 
 export default function ProfilePage() {
   const { data, isLoading, isError, error } = useGetCurrentUserQuery();
-console.log('error', error)
+
   const navigate = useNavigate();
   if (isLoading) {
     return <Loading />;
   }
-  if (isError) {
-    return <ErrorPage message={error.data.message} />;
-  }
+  // if (isError) {
+  //   return <ErrorPage message={error.data.message} />;
+  // }
 
   const user = data?.data;
 

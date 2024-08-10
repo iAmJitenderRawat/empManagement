@@ -11,64 +11,82 @@ import Contact from "./containers/Contact/Contact";
 import About from "./containers/About/About";
 import UsersPage from "./containers/Dashboard/Users/UsersPage";
 import ProjectsPage from "./containers/Dashboard/Projects/ProjectsPage";
+import ErrorPage from "./components/ErrorPage";
+import UserDetailPage from "./containers/Dashboard/Users/UserDetailPage";
 
 export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LogIn />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/register",
     element: <Register />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/",
     element: <Layout />,
     children: [
       {
-        path: "",
+        index: true,
         element: <LandingPage />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "dashboard",
-        // element: <ProtectedRoute />,
+        element: <ProtectedRoute />,
         children: [
           {
-            path: "",
+            index: true,
             element: <Dashboard />,
+            errorElement: <ErrorPage />,
           },
           {
             path: "users",
             element: <UsersPage />,
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: "users/:userId",
+            element: <UserDetailPage />,
+            errorElement: <ErrorPage />,
           },
           {
             path: "projects",
             element: <ProjectsPage />,
-          }
+            errorElement: <ErrorPage />,
+          },
         ],
       },
       {
         path: "profile",
-        // element: <ProtectedRoute />,
+        element: <ProtectedRoute />,
+        errorElement: <ErrorPage />,
         children: [
           {
-            path: "",
+            index: true,
             element: <ProfilePage />,
+            errorElement: <ErrorPage />,
           },
           {
             path: "edit",
             element: <EditProfilePage />,
+            errorElement: <ErrorPage />,
           },
         ],
       },
       {
         path: "contact",
         element: <Contact />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "about",
         element: <About />,
-      }
+        errorElement: <ErrorPage />,
+      },
     ],
   },
 ]);

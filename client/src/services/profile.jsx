@@ -1,6 +1,7 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout, setCredentials } from "../features/authSlice";
+import { authApi } from "./auth";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
@@ -16,9 +17,10 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
+    console.log("api", api);
     if (refreshResult.data) {
       // store the new token
-      api.dispatch(api.dispatch(setCredentials(refreshResult.data.data)));
+      api.dispatch(setCredentials(refreshResult.data.data));
       // retry the original query with new access token
       result = await baseQuery(args, api, extraOptions);
     } else {

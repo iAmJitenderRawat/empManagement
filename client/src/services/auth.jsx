@@ -15,17 +15,15 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
+    console.log('api', api)
     if (refreshResult.data) {
       // store the new token
-      api.dispatch(
-        authApi.util.updateQueryData("refreshToken", undefined, (draft) => {
-          draft.accessToken = refreshResult.data.accessToken;
-        })
-      );
+      api.dispatch(setCredentials(refreshResult.data.data));
       // retry the original query with new access token
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());
+      console.log("first")
     }
   }
 

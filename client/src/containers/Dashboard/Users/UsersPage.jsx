@@ -42,6 +42,7 @@ import {
   AiOutlineSortDescending,
 } from "react-icons/ai";
 import qs from "query-string";
+import DeleteModal from "../../../components/SimpleModal";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -55,30 +56,30 @@ const UsersPage = () => {
   const page = parseInt(query.get("page")) || 1;
   const [search, setSearch] = useState("");
   const [view, setView] = useState(false);
-  const { data, isLoading, isError } = useGetAllUsersQuery(
+  const { data, isLoading, isError, error } = useGetAllUsersQuery(
     qs.parse(location.search)
   );
   const qp = {
     page,
     sortField: "firstName",
     sortOrder: "asc",
-    search:"",
-    gender:"",
+    search: "",
+    gender: "",
   };
   const [queryParams, setQueryParams] = useState(qp);
-  useEffect(()=>{
-   const id= setTimeout(() => {
-      navigate(`?search=${search}`)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (search) navigate(`?search=${search}`);
     }, 500);
-    return ()=> clearTimeout(id)
-  },[])
+    return () => clearTimeout(id);
+  }, [search]);
 
   const [deleteUser, { isLoading: deleteUserLoading }] =
     useDeleteUserMutation();
   const { users, limit, totalPages, totalUsers } = data?.data ?? {};
 
   if (isLoading) return <Loading />;
-  if (isError) return <Error message={"Failed to load users."} />;
+  // if (isError) return <Error message={"Failed to load users."} />;
   return (
     <Box minH={height}>
       <Flex justify={"space-around"} align={"center"}>
@@ -124,18 +125,10 @@ const UsersPage = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <IconButton
-              icon={<SearchIcon />}
-              onClick={() => {
-                const currentParams = qs.parse(location.search);
-                const params = { ...currentParams, search };
-                const url = buildSearchQuery(params);
-                navigate(`?${url}`);
-              }}
-            />
             <Button
               onClick={() => {
                 const currentParams = qs.parse(location.search);
+                setSearch("");
                 const params = { ...currentParams, search: "" };
                 const url = buildSearchQuery(params);
                 navigate(`?${url}`);
@@ -158,9 +151,11 @@ const UsersPage = () => {
             <Select
               name="sortField"
               value={queryParams?.sortField}
-              onChange={(e) =>{
-                setQueryParams({ ...queryParams, sortField: e.target.value })
-                console.log('e.target.value', e.target.value)
+              onChange={(e) => {
+                setQueryParams({ ...queryParams, sortField: e.target.value });
+                const params = { ...queryParams, sortField: e.target.value };
+                const url = buildSearchQuery(params);
+                navigate(`?${url}`);
               }}
             >
               <option value="firstName">Name</option>
@@ -170,9 +165,20 @@ const UsersPage = () => {
             <Select
               name="gender"
               value={queryParams?.gender}
-              onChange={(e) =>
-                setQueryParams({ ...queryParams, gender: e.target.value })
-              }
+              onChange={(e) => {
+                setQueryParams({
+                  ...queryParams,
+                  gender: e.target.value,
+                  page: 1,
+                });
+                const params = {
+                  ...queryParams,
+                  gender: e.target.value,
+                  page: 1,
+                };
+                const url = buildSearchQuery(params);
+                navigate(`?${url}`);
+              }}
             >
               <option value="">Gender</option>
               <option value="male">Male</option>
@@ -180,16 +186,22 @@ const UsersPage = () => {
             </Select>
             <Flex>
               <IconButton
-                onClick={() =>
-                  setQueryParams({ ...queryParams, sortOrder: "asc" })
-                }
+                onClick={() => {
+                  setQueryParams({ ...queryParams, sortOrder: "asc" });
+                  const params = { ...queryParams, sortOrder: "asc" };
+                  const url = buildSearchQuery(params);
+                  navigate(`?${url}`);
+                }}
                 isDisabled={queryParams?.sortOrder === "asc"}
                 icon={<AiOutlineSortAscending />}
               />
               <IconButton
-                onClick={() =>
-                  setQueryParams({ ...queryParams, sortOrder: "desc" })
-                }
+                onClick={() => {
+                  setQueryParams({ ...queryParams, sortOrder: "desc" });
+                  const params = { ...queryParams, sortOrder: "desc" };
+                  const url = buildSearchQuery(params);
+                  navigate(`?${url}`);
+                }}
                 isDisabled={queryParams?.sortOrder === "desc"}
                 icon={<AiOutlineSortDescending />}
               />
@@ -197,17 +209,12 @@ const UsersPage = () => {
           </Flex>
           <Button
             onClick={() => {
-              const currentParams = qs.parse(location.search);
-              console.log("currentParams", currentParams);
-              const params = { ...currentParams, ...queryParams };
-              console.log("queryParams", queryParams);
-              const url = buildSearchQuery(params);
-              navigate(`?${url}`);
+              setSearch("");
+              navigate("?page=1");
             }}
           >
-            Filter
+            Reset Filter
           </Button>
-          <Button onClick={() => navigate("?page=1")}>Reset Filter</Button>
         </Flex>
       </Flex>
       {view ? (
@@ -223,22 +230,28 @@ const UsersPage = () => {
                   user={user}
                   children={
                     <Flex justify={"space-evenly"}>
-                      <Button
-                        leftIcon={<DeleteIcon />}
-                        colorScheme="red"
-                        size={"sm"}
+                      <DeleteModal
+                        icon={<DeleteIcon />}
+                        userId={user?._id}
                         isLoading={deleteUserLoading}
                         loadingText="Deleting"
-                        onClick={deleteUser}
-                      >
-                        Delete User
-                      </Button>
+                        handleDelete={deleteUser}
+                        btnText={"Delete"}
+                        title={"Delete"}
+                        body={`Are you sure you want to delete ${user?.firstName} ${user?.lastName ?? ""} ?`}
+                        btnColorScheme={"red"}
+                        actionBtnTitle={"Delete"}
+                        actionBtnColorScheme={"red"}
+                        btnDisplay={"block"}
+                        iconBtnDisplay={"none"}
+                      />
                       <Button
                         leftIcon={<ViewIcon />}
                         colorScheme="blue"
                         size={"sm"}
+                        onClick={() => navigate(`/dashboard/users/${user?._id}`)}
                       >
-                        View Profile
+                        View
                       </Button>
                     </Flex>
                   }
@@ -285,36 +298,30 @@ const UsersPage = () => {
                     <Td minW={125}>
                       <Flex justify={"space-evenly"}>
                         <Box>
-                          <Button
-                            display={{
+                          <DeleteModal
+                            icon={<DeleteIcon />}
+                            userId={user?._id}
+                            isLoading={deleteUserLoading}
+                            loadingText="Deleting"
+                            handleDelete={deleteUser}
+                            btnText={"Delete"}
+                            title={"Delete User"}
+                            body={`Are you sure you want to delete ${user?.firstName} ${user?.lastName ?? ""} ?`}
+                            btnColorScheme={"red"}
+                            actionBtnTitle={"Delete"}
+                            actionBtnColorScheme={"red"}
+                            btnDisplay={{
                               base: "none",
                               sm: "none",
                               md: "none",
                               lg: "block",
                             }}
-                            leftIcon={<DeleteIcon />}
-                            colorScheme="red"
-                            size={"sm"}
-                            p={1}
-                            isLoading={deleteUserLoading}
-                            loadingText="Deleting"
-                            onClick={deleteUser}
-                          >
-                            Delete User
-                          </Button>
-                          <IconButton
-                            display={{
+                            iconBtnDisplay={{
                               base: "block",
                               sm: "block",
                               md: "block",
                               lg: "none",
                             }}
-                            p={1}
-                            size={"sm"}
-                            colorScheme="red"
-                            icon={<DeleteIcon />}
-                            isLoading={deleteUserLoading}
-                            onClick={deleteUser}
                           />
                         </Box>
                         <Box>
@@ -328,8 +335,9 @@ const UsersPage = () => {
                               md: "none",
                               lg: "block",
                             }}
+                            onClick={() => navigate(`/dashboard/users/${user?._id}`)}
                           >
-                            View Profile
+                            View
                           </Button>
                           <IconButton
                             display={{
@@ -338,6 +346,7 @@ const UsersPage = () => {
                               md: "block",
                               lg: "none",
                             }}
+                            onClick={() => navigate(`/dashboard/users/${user?._id}`)}
                             size={"sm"}
                             colorScheme="blue"
                             icon={<ViewIcon />}

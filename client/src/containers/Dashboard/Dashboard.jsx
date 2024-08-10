@@ -24,9 +24,9 @@ const Dashboard = () => {
   if (isLoadingUsers || isLoadingProjects) {
     return <Loading />;
   }
-  if(isErrorUsers||isErrorProjects){
-    return <Error message={"Failed to load data."} />
-  }
+  // if(isErrorUsers||isErrorProjects){
+  //   return <Error message={"Failed to load data."} />
+  // }
   return (
     <main>
       <Center>

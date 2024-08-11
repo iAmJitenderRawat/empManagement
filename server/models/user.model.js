@@ -21,6 +21,11 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
+    designation: {
+      type: String,
+      enum: ["associate","senior-associate", "manager", "director"],
+      default: "associate",
+    },
     gender: {
       type: String,
       enum: ["male", "female"],
@@ -55,6 +60,9 @@ const userSchema = new Schema(
     hobbies: {
       type: [String],
       trim: true,
+    },
+    projects: {
+      type: [{id: {type:String,trim:true}, name: {type:String,trim:true}, status: {type:String}}],
     },
   },
   { timestamps: true }

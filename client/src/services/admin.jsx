@@ -19,7 +19,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
-    console.log('api', api)
+    console.log("api", api);
+    console.log("refreshResult", refreshResult);
     if (refreshResult.data) {
       // store the new token
       api.dispatch(setCredentials(refreshResult.data.data));
@@ -27,7 +28,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());
-      console.log("first")
+      console.log("first");
     }
   }
 
@@ -50,6 +51,33 @@ export const adminApi = createApi({
         };
       },
       providesTags: ["getAllUsers"],
+    }),
+    addUser: builder.mutation({
+      query: (user) => ({
+        url: "/admin/addUser",
+        method: "POST",
+        body: user,
+      }),
+      invalidatesTags: ["getAllUsers"],
+    }),
+    userDetail: builder.query({
+      query: (id) => {
+        console.log("id", id);
+        return {
+          url: `/admin/users/${id}`,
+          method: "GET",
+        };
+      },
+    }),
+    updateUser: builder.mutation({
+      query: (userDetail) => {
+        return {
+          url: `/admin/updateUser/${userDetail._id}`,
+          method: "PATCH",
+          body: userDetail,
+        };
+      },
+      invalidatesTags: ["getAllUsers"],
     }),
     deleteUser: builder.mutation({
       query: (id) => {
@@ -92,8 +120,11 @@ export const adminApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
   useGetAllUsersQuery,
+  useUserDetailQuery,
+  useAddUserMutation,
   useDeleteUserMutation,
   useAddProjectMutation,
   useGetAllProjectsQuery,
   useDeleteProjectMutation,
+  useUpdateUserMutation,
 } = adminApi;

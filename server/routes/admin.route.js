@@ -1,11 +1,14 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { addProject, deleteProject, deleteUser, getAllProjects, getAllUsers } from "../controllers/admin.controller.js";
+import { addProject, createUser, deleteProject, deleteUser, getAllProjects, getAllUsers, updateUser, userDetail } from "../controllers/admin.controller.js";
 
 const router = Router();
 //users
 router.route("/users").get(verifyJWT, getAllUsers);
+router.route("/users/:id").get(verifyJWT, userDetail);
+router.route("/users/add").post(verifyJWT, createUser);
 router.route("/deleteUser/:id").delete(verifyJWT, deleteUser);
+router.route("/updateUser/:id").patch(verifyJWT, updateUser);
 
 //projects
 router.route("/addProject").post(verifyJWT, addProject);

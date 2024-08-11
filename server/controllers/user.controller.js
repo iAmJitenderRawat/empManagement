@@ -11,6 +11,7 @@ import {
 } from "../utils/constants.js";
 import {
   generateAccessAndRefreshToken,
+  generateAccessToken,
   isValidEmail,
 } from "../utils/helperFunctions.js";
 import jwt from "jsonwebtoken";
@@ -172,18 +173,19 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     if (!user) {
       return res.status(400).json(new ApiError("Invalid refresh token", 400));
     }
+    console.log("user.refreshToken", user.refreshToken, incomingRefreshToken);
     if (incomingRefreshToken !== user.refreshToken) {
       return res
         .status(400)
         .json(new ApiError("Refresh token is expired or used", 400));
     }
-    const { accessToken, refreshToken, message } =
-      await generateAccessAndRefreshToken(user._id);
+    const { accessToken, message } =
+      await generateAccessToken(user._id);
     user.refreshToken = null;
     return res
       .status(200)
       .cookie("accessToken", accessToken, accessCookieOptions)
-      .cookie("refreshToken", refreshToken, refreshCookieOptions)
+      // .cookie("refreshToken", refreshToken, refreshCookieOptions)
       .json(new ApiResponse({ accessToken, user }, message, 200));
   } catch (error) {
     return res.status(401).json(new ApiError("Invalid refresh token", 401));

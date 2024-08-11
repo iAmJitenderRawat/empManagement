@@ -39,7 +39,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   return (
     <Box
-    id="footer"
+      id="footer"
       bg={useColorModeValue("gray.50", "gray.900")}
       color={useColorModeValue("gray.700", "gray.200")}
     >
@@ -51,17 +51,16 @@ export default function Footer() {
         justify={"center"}
         align={"center"}
       >
-        <Image w={170} objectFit={"cover"} src={"/logo.png"} alt={"logo"} />
-        <SimpleGrid
-          columns={{ base: 2, sm: 3, md: 6 }}
-          spacing={6}
-        >
-          <Link to={"/"}>Home</Link>
+        <Link to={"/"}>
+          <Image w={170} objectFit={"cover"} src={"/logo.png"} alt={"logo"} />
+        </Link>
+        <SimpleGrid columns={{ base: 2, sm: 3, md: 6 }} spacing={6}>
           <Link to={"/about"}>About</Link>
           <Link to={"/contact"}>Contact</Link>
           <Link to={"/profile"}>Profile</Link>
           <Link to={"/dashboard"}>Dashboard</Link>
-          <Link to={"/projects"}>Projects</Link>
+          <Link to={"/dashboard/users"}>Users</Link>
+          <Link to={"/dashboard/projects"}>Projects</Link>
         </SimpleGrid>
       </Container>
 

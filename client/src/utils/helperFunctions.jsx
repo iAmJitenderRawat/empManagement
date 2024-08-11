@@ -1,4 +1,5 @@
 import queryString from "query-string";
+import { useLocation } from "react-router-dom";
 
 export function getAvailableHeight() {
   const windowHeight =
@@ -29,4 +30,8 @@ export const buildSearchQuery = (filters) => {
 
   const queryStringified = queryString.stringify(searchParams);
   return queryStringified;
+};
+
+export const useQuery = () => {
+  return new URLSearchParams(useLocation().search);
 };

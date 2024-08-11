@@ -30,12 +30,13 @@ import moment from "moment";
 import {
   buildSearchQuery,
   getAvailableHeight,
+  useQuery,
 } from "../../../utils/helperFunctions";
 import ProfileCard from "../../../components/ProfileCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loading from "../../../components/Loading";
 import Pagination from "../../../components/Pagination";
-import { DeleteIcon, SearchIcon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, SearchIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdViewList, MdGridView } from "react-icons/md";
 import {
   AiOutlineSortAscending,
@@ -44,16 +45,13 @@ import {
 import qs from "query-string";
 import DeleteModal from "../../../components/SimpleModal";
 
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
-};
-
 const UsersPage = () => {
   const height = getAvailableHeight();
   const query = useQuery();
   const location = useLocation();
   const navigate = useNavigate();
   const page = parseInt(query.get("page")) || 1;
+  const searchText = query.get("search") || "";
   const [search, setSearch] = useState("");
   const [view, setView] = useState(false);
   const { data, isLoading, isError, error } = useGetAllUsersQuery(
@@ -65,6 +63,7 @@ const UsersPage = () => {
     sortOrder: "asc",
     search: "",
     gender: "",
+    designation: "",
   };
   const [queryParams, setQueryParams] = useState(qp);
   useEffect(() => {
@@ -79,7 +78,7 @@ const UsersPage = () => {
   const { users, limit, totalPages, totalUsers } = data?.data ?? {};
 
   if (isLoading) return <Loading />;
-  // if (isError) return <Error message={"Failed to load users."} />;
+  if (isError) return <Error message={error||"Failed to load users."} />;
   return (
     <Box minH={height}>
       <Flex justify={"space-around"} align={"center"}>
@@ -111,7 +110,7 @@ const UsersPage = () => {
         align={"center"}
         justify={"space-around"}
         gap={5}
-        flexDir={{ base: "column", sm: "column", md: "row" }}
+        flexDir={{ base: "column", sm: "column", md: "column", lg: "row" }}
       >
         <Flex gap={5} justify={"center"} align={"center"}>
           <Heading as={"h3"} fontSize={"x-large"}>
@@ -122,7 +121,7 @@ const UsersPage = () => {
               type="text"
               name="search"
               placeholder="Search"
-              value={search}
+              value={search||searchText}
               onChange={(e) => setSearch(e.target.value)}
             />
             <Button
@@ -142,7 +141,7 @@ const UsersPage = () => {
           gap={5}
           justify={"center"}
           align={"center"}
-          flexDir={{ base: "column", sm: "row", md: "row" }}
+          flexDir={{ base: "column", sm: "column", md: "row" }}
         >
           <Heading as={"h3"} fontSize={"x-large"}>
             Filter
@@ -184,6 +183,32 @@ const UsersPage = () => {
               <option value="male">Male</option>
               <option value="female">Female</option>
             </Select>
+          </Flex>
+          <Flex gap={5}>
+            <Select
+              name="designation"
+              value={queryParams?.designation}
+              onChange={(e) => {
+                setQueryParams({
+                  ...queryParams,
+                  designation: e.target.value,
+                  page: 1,
+                });
+                const params = {
+                  ...queryParams,
+                  designation: e.target.value,
+                  page: 1,
+                };
+                const url = buildSearchQuery(params);
+                navigate(`?${url}`);
+              }}
+            >
+              <option value="">Designation</option>
+              <option value="associate">Associate</option>
+              <option value="senior-associate">Senior Associate</option>
+              <option value="manager">Manager</option>
+              <option value="director">Director</option>
+            </Select>
             <Flex>
               <IconButton
                 onClick={() => {
@@ -208,6 +233,8 @@ const UsersPage = () => {
             </Flex>
           </Flex>
           <Button
+            p={2}
+            colorScheme={"red"}
             onClick={() => {
               setSearch("");
               navigate("?page=1");
@@ -217,6 +244,16 @@ const UsersPage = () => {
           </Button>
         </Flex>
       </Flex>
+
+      <Box>
+        <Button
+          leftIcon={<AddIcon />}
+          colorScheme="blue"
+          onClick={() => navigate("/dashboard/users/add")}
+        >
+          Add User
+        </Button>
+      </Box>
       {view ? (
         <SimpleGrid
           m={"2em"}
@@ -249,7 +286,9 @@ const UsersPage = () => {
                         leftIcon={<ViewIcon />}
                         colorScheme="blue"
                         size={"sm"}
-                        onClick={() => navigate(`/dashboard/users/${user?._id}`)}
+                        onClick={() =>
+                          navigate(`/dashboard/users/${user?._id}`)
+                        }
                       >
                         View
                       </Button>
@@ -335,7 +374,9 @@ const UsersPage = () => {
                               md: "none",
                               lg: "block",
                             }}
-                            onClick={() => navigate(`/dashboard/users/${user?._id}`)}
+                            onClick={() =>
+                              navigate(`/dashboard/users/${user?._id}`)
+                            }
                           >
                             View
                           </Button>
@@ -346,7 +387,9 @@ const UsersPage = () => {
                               md: "block",
                               lg: "none",
                             }}
-                            onClick={() => navigate(`/dashboard/users/${user?._id}`)}
+                            onClick={() =>
+                              navigate(`/dashboard/users/${user?._id}`)
+                            }
                             size={"sm"}
                             colorScheme="blue"
                             icon={<ViewIcon />}

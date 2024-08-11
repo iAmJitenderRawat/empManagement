@@ -45,9 +45,12 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   const sortOrder = req?.query?.sortOrder ?? "asc";
 
   const query = {};
-  console.log("req?.query", req?.query);
+
   if (search) {
-    query.firstName = { $regex: search, $options: "i" };
+    query.$or =[ 
+      { firstName: { $regex: search, $options: "i" } }, 
+      { _id: search}
+    ];
   }
 
   if (gender) {
@@ -55,8 +58,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   }
   const sortOptions = {};
   sortOptions[sortField] = sortOrder === "asc" ? 1 : -1;
-  console.log("query", query);
-  console.log("sortOptions", sortOptions);
+
   if (page < 1) {
     return res.status(400).json(new ApiError("Page can't be less than 1", 403));
   }
@@ -85,13 +87,53 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   }
 });
 
+export const userDetail = asyncHandler(async (req, res) => {
+  try {
+    if (req.user.userRole !== "admin") {
+      return res.status(403).json(new ApiError("Access denied", 403));
+    }
+
+    const id = req?.params?.id;
+    const user = await User.findById(id).select("-password -refreshToken");
+    if (!user) {
+      return res.status(404).json(new ApiError("User not found", 404));
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse({ user }, "User retrieved successfully", 200));
+  } catch (error) {
+    return res.status(400).json(new ApiError(error.message, 400));
+  }
+});
+
+export const updateUser = asyncHandler(async (req, res) => {
+  try {
+    if (req.user.userRole !== "admin") {
+      return res.status(403).json(new ApiError("Access denied", 403));
+    }
+    const id = req?.params?.id;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json(new ApiError("User not found", 404));
+    }
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+    }).select("-password -refreshToken");
+    return res
+      .status(200)
+      .json(new ApiResponse(updatedUser, "User updated successfully", 200));
+  } catch (error) {
+    return res.status(400).json(new ApiError(error.message, 400));
+  }
+});
+
 export const deleteUser = asyncHandler(async (req, res) => {
   try {
     if (req.user.userRole !== "admin") {
       return res.status(403).json(new ApiError("Access denied", 403));
     }
     const id = req.params.id;
-    console.log('id', id)
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json(new ApiError("User not found", 404));
@@ -100,6 +142,20 @@ export const deleteUser = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(new ApiResponse({}, "User deleted successfully", 200));
+  } catch (error) {
+    return res.status(400).json(new ApiError(error.message, 400));
+  }
+});
+
+export const createUser = asyncHandler(async (req, res) => {
+  try {
+    if (req.user.userRole !== "admin") {
+      return res.status(403).json(new ApiError("Access denied", 403));
+    }
+    const user = await User.create(req.body);
+    return res
+      .status(201)
+      .json(new ApiResponse(user, "User created successfully", 201));
   } catch (error) {
     return res.status(400).json(new ApiError(error.message, 400));
   }

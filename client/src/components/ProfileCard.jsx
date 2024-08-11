@@ -70,12 +70,21 @@ const ProfileCard = ({ user, children }) => {
         textAlign={"center"}
         color={useColorModeValue("gray.700", "gray.400")}
         px={3}
+        textTransform={"capitalize"}
+      >
+        {user?.designation}
+      </Text>
+      <Text
+        textAlign={"center"}
+        color={useColorModeValue("gray.700", "gray.400")}
+        px={3}
       >
         <Text as={"span"} color={"blue.400"}>
           Joined in{" "}
         </Text>
         {moment(user?.createdAt).format("L")}
       </Text>
+      {user?.projects?.length>0 && <Text color={"blue.400"}>{user?.projects?.length==1 ? `${user?.projects?.length} Project` : `${user?.projects?.length} Projects`}</Text>}
       <Text color={"blue.400"}>Hobbies</Text>
       <Flex
         flexWrap={"wrap"}

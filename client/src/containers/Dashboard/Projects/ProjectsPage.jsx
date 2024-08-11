@@ -44,6 +44,7 @@ import {
 } from "react-icons/ai";
 import qs from "query-string";
 import DeleteModal from "../../../components/SimpleModal";
+import ProjectCard from "../../../components/ProjectCard";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -57,9 +58,10 @@ const ProjectsPage = () => {
   const page = parseInt(query.get("page")) || 1;
   const [search, setSearch] = useState("");
   const [view, setView] = useState(false);
-  const { data, isLoading } = useGetAllProjectsQuery(
+  const { data, isLoading, isError, error } =
+    useGetAllProjectsQuery();
     // qs.parse(location.search)
-  );
+    const {projects, limit, totalPages, totalProjects}=data?.data ??{};
   const qp = {
     page,
     sortField: "firstName",
@@ -74,17 +76,15 @@ const ProjectsPage = () => {
     }, 500);
     return () => clearTimeout(id);
   }, [search]);
-  
+
   const [deleteUser, { isLoading: deleteUserLoading }] =
-  useDeleteUserMutation();
-  // const { projects, limit, totalPages, totalProjects } = data?.data ?? {};
-  
-  console.log('data', data)
+    useDeleteUserMutation();
+
   if (isLoading) return <Loading />;
-  // if (isError) return <Error message={"Failed to load projects."} />;
+  if (isError) return <Error message={error||"Failed to load projects."} />;
   return (
     <Box minH={height}>
-      {/* <Flex justify={"space-around"} align={"center"}>
+      <Flex justify={"space-around"} align={"center"}>
         {projects?.length >= limit ? (
           <Text>
             {projects?.length * page} of {totalProjects} projects
@@ -226,24 +226,26 @@ const ProjectsPage = () => {
           spacing={10}
         >
           {projects?.length > 0 ? (
-            projects?.map((user) => (
-              <Box key={user._id}>
-                <ProfileCard
-                  user={user}
+            projects?.map((project) => (
+              <Box key={project._id}>
+                <ProjectCard
+                  project={project}
                   children={
                     <Flex justify={"space-evenly"}>
                       <DeleteModal
                         icon={<DeleteIcon />}
-                        userId={user?._id}
+                        userId={project?._id}
                         isLoading={deleteUserLoading}
                         loadingText="Deleting"
                         handleDelete={deleteUser}
                         btnText={"Delete User"}
                         title={"Delete"}
-                        body={`Are you sure you want to delete ${user?.firstName} ${user?.lastName ?? ""} ?`}
+                        body={`Are you sure you want to delete ${project?.name}} ?`}
                         btnColorScheme={"red"}
                         actionBtnTitle={"Delete"}
                         actionBtnColorScheme={"red"}
+                        btnDisplay={"block"}
+                        iconBtnDisplay={"none"}
                       />
                     </Flex>
                   }
@@ -263,45 +265,52 @@ const ProjectsPage = () => {
               <Thead>
                 <Tr>
                   <Th>Sr No</Th>
-                  <Th>Avatar</Th>
                   <Th>Name</Th>
-                  <Th>Email</Th>
-                  <Th>Joining Date</Th>
+                  <Th>Description</Th>
+                  <Th>Status/Priority</Th>
+                  <Th>Start Date</Th>
                   <Th textAlign={"center"}>Action</Th>
                 </Tr>
               </Thead>
             )}
             <Tbody>
               {projects?.length > 0 ? (
-                projects?.map((user, i) => (
-                  <Tr key={user._id}>
+                projects?.map((project, i) => (
+                  <Tr key={project._id}>
                     <Td>{limit * (page - 1) + (i + 1)}</Td>
+                    <Td textTransform={"capitalize"}>{project?.name}</Td>
+                    <Td>{project?.description}</Td>
                     <Td>
-                      <Avatar
-                        src={user?.avatar?.secure_url}
-                        alt={user?.firstName}
-                      />
+                      {project?.status}/{project?.priority}
                     </Td>
-                    <Td textTransform={"capitalize"}>
-                      {user?.firstName} {user?.lastName}
-                    </Td>
-                    <Td>{user?.email}</Td>
-                    <Td>{moment(user?.createdAt).format("L")}</Td>
+                    <Td>{moment(project?.startDate).format("L")}</Td>
                     <Td minW={125}>
                       <Flex justify={"space-evenly"}>
                         <Box>
                           <DeleteModal
                             icon={<DeleteIcon />}
-                            userId={user?._id}
+                            userId={project?._id}
                             isLoading={deleteUserLoading}
                             loadingText="Deleting"
                             handleDelete={deleteUser}
                             btnText={"Delete"}
                             title={"Delete User"}
-                            body={`Are you sure you want to delete ${user?.firstName} ${user?.lastName ?? ""} ?`}
+                            body={`Are you sure you want to delete ${project?.firstName} ${project?.lastName ?? ""} ?`}
                             btnColorScheme={"red"}
                             actionBtnTitle={"Delete"}
                             actionBtnColorScheme={"red"}
+                            btnDisplay={{
+                              base: "none",
+                              sm: "none",
+                              md: "none",
+                              lg: "block",
+                            }}
+                            iconBtnDisplay={{
+                              base: "block",
+                              sm: "block",
+                              md: "block",
+                              lg: "none",
+                            }}
                           />
                         </Box>
                       </Flex>
@@ -319,10 +328,9 @@ const ProjectsPage = () => {
       )}
       {(projects?.length >= limit || page > 1) && (
         <Pagination totalPages={totalPages} page={page} />
-      )} */}
+      )}
     </Box>
   );
 };
-
 
 export default ProjectsPage;

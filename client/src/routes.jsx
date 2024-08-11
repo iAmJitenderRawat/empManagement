@@ -13,6 +13,7 @@ import UsersPage from "./containers/Dashboard/Users/UsersPage";
 import ProjectsPage from "./containers/Dashboard/Projects/ProjectsPage";
 import ErrorPage from "./components/ErrorPage";
 import UserDetailPage from "./containers/Dashboard/Users/UserDetailPage";
+import AddUserPage from "./containers/Dashboard/Users/AddUserPage";
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,11 @@ export const router = createBrowserRouter([
           {
             path: "users/:userId",
             element: <UserDetailPage />,
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: "users/add",
+            element: <AddUserPage />,
             errorElement: <ErrorPage />,
           },
           {

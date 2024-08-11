@@ -18,6 +18,7 @@ import {
 } from "../../services/profile";
 import ChangeOrUpdateAvatarModal from "../../components/ChangeOrUpdateAvatarModal";
 import TagWithCross from "../../components/TagWithCross";
+import { AddIcon } from "@chakra-ui/icons";
 
 const EditProfilePage = () => {
   const { data } = useGetCurrentUserQuery();
@@ -126,8 +127,9 @@ const EditProfilePage = () => {
               <FormLabel>Hobbies</FormLabel>
               <TagWithCross
                 size={"md"}
-                hobbies={userDetails?.hobbies}
-                setHobbies={setUserDetails}
+                array={userDetails?.hobbies}
+                setArray={setUserDetails}
+                name={"hobbies"}
               />
               <HStack>
                 <Input
@@ -146,6 +148,7 @@ const EditProfilePage = () => {
                   }}
                 />
                 <Button
+                  leftIcon={<AddIcon />}
                   onClick={() => {
                     if (hobby !== "") {
                       setUserDetails((prevData) => ({
@@ -164,6 +167,7 @@ const EditProfilePage = () => {
           <Button
             isLoading={updateUserLoading}
             loadingText="Updating"
+            colorScheme="blue"
             onClick={handleClick}
           >
             Update Details

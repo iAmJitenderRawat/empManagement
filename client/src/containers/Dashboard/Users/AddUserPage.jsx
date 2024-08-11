@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "../../../utils/helperFunctions";
 import {
+  useAddUserMutation,
   useGetAllProjectsQuery,
   useUpdateUserMutation,
   useUserDetailQuery,
@@ -26,32 +27,30 @@ import ErrorPage from "../../../components/ErrorPage";
 import { AddIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import Select from "react-select";
 
-const UserDetailPage = () => {
-  const param = useParams();
-  const id = param?.userId;
-  const { data, isLoading:isUserLoading, isError:isUserError, error:userError } = useUserDetailQuery(id);
-  const { data: projectsData, isLoading: isProjectsLoading, isError: isProjectsError, error: projectsError } = useGetAllProjectsQuery();
+const AddUserPage = () => {
+  const {
+    data: projectsData,
+    isLoading: isProjectsLoading,
+    isError: isProjectsError,
+    error: projectsError,
+  } = useGetAllProjectsQuery();
   const [mode, setMode] = useState("View");
-  const user = data?.data?.user;
-  const [userDetails, setUserDetails] = useState({});
-  useEffect(() => {
-    setUserDetails({
-      _id: user?._id,
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      email: user?.email,
-      bio: user?.bio ?? "",
-      hobbies: user?.hobbies ?? [],
-      projects: user?.projects ?? [],
-    });
-  }, [user, isUserLoading]);
+  const user = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    bio: "",
+    hobbies: [],
+    projects: [],
+  };
+  const [userDetails, setUserDetails] = useState(user);
+
   const avatarUrl = user?.avatar?.secure_url;
 
   const [hobby, setHobby] = useState("");
-  const [updateUser, { isLoading: updateUserLoading }] =
-    useUpdateUserMutation();
+  const [addUser, { isLoading: addUserLoading, error: addUserError }] = useAddUserMutation();
   const toast = useToast();
-  const projects  = projectsData?.data?.projects;
+  const projects = projectsData?.data?.projects;
   const [project, setProject] = useState("");
 
   const handleChange = (e) => {
@@ -61,7 +60,7 @@ const UserDetailPage = () => {
 
   const handleClick = async () => {
     try {
-      const result = await updateUser(userDetails);
+      const result = await addUser(userDetails);
       toast({
         position: "top",
         title: result?.data?.message ?? result.error?.data?.message,
@@ -79,9 +78,10 @@ const UserDetailPage = () => {
       });
     }
   };
-  if (isUserLoading || isProjectsLoading) return <Loading />;
+  if (addUserLoading || isProjectsLoading) return <Loading />;
 
-  if (isUserError || isProjectsError) return <ErrorPage message={userError || projectsError?.data?.message} />;
+  if (addUserError || isProjectsError)
+    return <ErrorPage message={addUserError || projectsError?.data?.message} />;
   return (
     <main>
       <Center
@@ -258,11 +258,11 @@ const UserDetailPage = () => {
                   }))}
                   onChange={(e) => setProject(e)}
                   isDisabled={mode === "View"}
-                //   className="basic-multi-select"
-                //   classNamePrefix="select"
+                  //   className="basic-multi-select"
+                  //   classNamePrefix="select"
                 />
-                {console.log('userDetails', userDetails)}
-                {console.log('project', project)}
+                {console.log("userDetails", userDetails)}
+                {console.log("project", project)}
                 <Button
                   leftIcon={<AddIcon />}
                   colorScheme="green"
@@ -286,7 +286,7 @@ const UserDetailPage = () => {
             </FormControl>
           </Stack>
           <Button
-            isLoading={updateUserLoading}
+            isLoading={addUserLoading}
             loadingText="Updating"
             colorScheme="blue"
             onClick={handleClick}
@@ -300,4 +300,4 @@ const UserDetailPage = () => {
   );
 };
 
-export default UserDetailPage;
+export default AddUserPage;

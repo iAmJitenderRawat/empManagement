@@ -19,7 +19,6 @@ import {
   Stack,
   useToast,
   useColorModeValue,
-  Switch
 } from "@chakra-ui/react";
 import TagWithCross from "../../../components/TagWithCross";
 import Loading from "../../../components/Loading";
@@ -27,7 +26,7 @@ import ErrorPage from "../../../components/ErrorPage";
 import { AddIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import Select from "react-select";
 
-const UserDetailPage = () => {
+const ProjectDetailPage = () => {
   const param = useParams();
   const id = param?.userId;
   const {
@@ -35,24 +34,22 @@ const UserDetailPage = () => {
     isLoading: isUserLoading,
     isError: isUserError,
     error: userError,
-  } = useUserDetailQuery(id);
+  } = useProjectDetailQuery(id);
   const {
     data: projectsData,
     isLoading: isProjectsLoading,
     isError: isProjectsError,
     error: projectsError,
-  } = useGetAllProjectsQuery({page:1});
+  } = useGetAllProjectsQuery({ page: 1 });
   const [mode, setMode] = useState("View");
   const user = data?.data?.user;
-  const [userDetails, setUserDetails] = useState({});
+  const [projectDetails, setProjectDetails] = useState({});
   useEffect(() => {
-    setUserDetails({
+    setProjectDetails({
       _id: user?._id,
       firstName: user?.firstName,
       lastName: user?.lastName,
-      userRole: user?.userRole,
       email: user?.email,
-      isAvailable: user?.isAvailable,
       designation: user?.designation,
       bio: user?.bio ?? "",
       hobbies: user?.hobbies ?? [],
@@ -66,22 +63,24 @@ const UserDetailPage = () => {
     useUpdateUserMutation();
   const toast = useToast();
   const projects = projectsData?.data?.projects;
-  const projectOptions = projects?.filter(project=>project.status === 'active')?.map((project) => ({
-    _id: project._id,
-    name: project.name,
-    status: project.status,
-    value: project._id,
-    label: project.name,
-  }));
+  const projectOptions = projects
+    ?.filter((project) => project.status === "active")
+    ?.map((project) => ({
+      _id: project._id,
+      name: project.name,
+      status: project.status,
+      value: project._id,
+      label: project.name,
+    }));
 
   const handleChange = (e) => {
     const { name, value } = e?.target;
-    setUserDetails((prevData) => ({ ...prevData, [name]: value }));
+    setProjectDetails((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleClick = async () => {
     try {
-      const result = await updateUser(userDetails);
+      const result = await updateUser(projectDetails);
       toast({
         position: "top",
         title: result?.data?.message ?? result.error?.data?.message,
@@ -102,7 +101,11 @@ const UserDetailPage = () => {
   if (isUserLoading || isProjectsLoading) return <Loading />;
 
   if (isUserError || isProjectsError)
-    return <ErrorPage message={userError?.data?.message || projectsError?.data?.message} />;
+    return (
+      <ErrorPage
+        message={userError?.data?.message || projectsError?.data?.message}
+      />
+    );
   return (
     <main>
       <Center
@@ -136,66 +139,73 @@ const UserDetailPage = () => {
           <Stack>
             <HStack flexDir={{ base: "column", sm: "row" }}>
               <FormControl isRequired>
-                <FormLabel>First name</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <Input
-                  placeholder="First name"
-                  name={"firstName"}
+                  placeholder="Name"
+                  name={"name"}
                   onChange={handleChange}
-                  value={userDetails?.firstName}
+                  value={projectDetails?.name}
                   disabled={mode === "View"}
                 />
               </FormControl>
-              <FormControl>
-                <FormLabel>Last name</FormLabel>
-                <Input
-                  placeholder="Last name"
-                  name={"lastName"}
+              <FormControl isRequired>
+                <FormLabel>Status</FormLabel>
+                <ChakraSelect
+                  name={"status"}
                   onChange={handleChange}
-                  value={userDetails?.lastName}
+                  value={projectDetails?.status}
                   disabled={mode === "View"}
-                />
+                >
+                  <option value="">Select Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">InActive</option>
+                </ChakraSelect>
               </FormControl>
             </HStack>
             <FormControl isRequired>
-              <FormLabel>Email</FormLabel>
-              <Input
-                placeholder="Email"
-                name={"email"}
+              <FormLabel>Priority</FormLabel>
+              <ChakraSelect
+                name={"priority"}
                 onChange={handleChange}
-                value={userDetails?.email}
+                value={projectDetails?.priority}
+                disabled={mode === "View"}
+              >
+                <option value="">Select Priority</option>
+                <option value="low">Low</option>
+                <option value="high">High</option>
+              </ChakraSelect>
+            </FormControl>
+            <FormControl>
+              <FormLabel>TimeLine</FormLabel>
+              <Input
+                type="number"
+                placeholder="TimeLine (in days)"
+                name={"timeline"}
+                onChange={handleChange}
+                value={projectDetails?.timeline}
                 disabled={mode === "View"}
               />
             </FormControl>
             <FormControl isRequired>
-              <FormLabel>Designation</FormLabel>
+              <FormLabel>Project Lead</FormLabel>
               <ChakraSelect
-                name={"designation"}
+                name={"projectLead"}
                 onChange={handleChange}
-                value={userDetails?.designation}
+                value={projectDetails?.projectLead}
                 disabled={mode === "View"}
               >
-                <option value="associate">Associate</option>
+                <option value="">Associate</option>
                 <option value="senior-associate">Senior Associate</option>
                 <option value="Manager">Manager</option>
                 <option value="Director">Director</option>
               </ChakraSelect>
             </FormControl>
             <FormControl>
-              <FormLabel>Bio</FormLabel>
-              <Input
-                placeholder="Bio"
-                name={"bio"}
-                onChange={handleChange}
-                value={userDetails?.bio}
-                disabled={mode === "View"}
-              />
-            </FormControl>
-            <FormControl>
               <FormLabel>Hobbies</FormLabel>
               <TagWithCross
                 size={"md"}
-                array={userDetails?.hobbies}
-                setArray={setUserDetails}
+                array={projectDetails?.hobbies}
+                setArray={setProjectDetails}
                 name={"hobbies"}
                 isDisabled={mode === "View"}
               />
@@ -208,9 +218,9 @@ const UserDetailPage = () => {
                   disabled={mode === "View"}
                   onKeyDown={(e) => {
                     if (hobby !== "" && e.key === "Enter") {
-                      setUserDetails((prevData) => ({
+                      setProjectDetails((prevData) => ({
                         ...prevData,
-                        hobbies: [...userDetails?.hobbies, hobby],
+                        hobbies: [...projectDetails?.hobbies, hobby],
                       }));
                       setHobby("");
                     }
@@ -221,9 +231,9 @@ const UserDetailPage = () => {
                   colorScheme="green"
                   onClick={() => {
                     if (hobby !== "") {
-                      setUserDetails((prevData) => ({
+                      setProjectDetails((prevData) => ({
                         ...prevData,
-                        hobbies: [...userDetails?.hobbies, hobby],
+                        hobbies: [...projectDetails?.hobbies, hobby],
                       }));
                       setHobby("");
                     }
@@ -238,9 +248,9 @@ const UserDetailPage = () => {
               <FormControl isRequired>
                 <FormLabel>Role</FormLabel>
                 <ChakraSelect
-                  name={"userRole"}
+                  name={"role"}
                   onChange={handleChange}
-                  value={userDetails?.userRole}
+                  value={projectDetails?.role}
                   disabled={mode === "View"}
                 >
                   <option value="user">User</option>
@@ -248,39 +258,36 @@ const UserDetailPage = () => {
                 </ChakraSelect>
               </FormControl>
               <FormControl isRequired>
-                <FormLabel htmlFor="isAvailable">Availablity:</FormLabel>
-                <Switch
-                  id="isAvailable"
+                <FormLabel>Status</FormLabel>
+                <ChakraSelect
                   name={"isAvailable"}
-                  size={"lg"}
-                  isChecked={userDetails?.isAvailable}
-                  onChange={(e) =>
-                    setUserDetails((prevData) => ({
-                      ...prevData,
-                      isAvailable: e.target.checked,
-                    }))
-                  }
-                />
+                  onChange={handleChange}
+                  value={projectDetails?.isAvailable}
+                  disabled={mode === "View"}
+                >
+                  <option value={true}>Active</option>
+                  <option value={false}>Inactive</option>
+                </ChakraSelect>
               </FormControl>
             </HStack>
             <FormControl>
               <FormLabel>Projects</FormLabel>
               {/* <TagWithCross
                 size={"md"}
-                array={userDetails?.projects}
-                setArray={setUserDetails}
+                array={projectDetails?.projects}
+                setArray={setProjectDetails}
                 name={"projects"}
               /> */}
               <HStack>
                 <Select
                   styles={styles}
-                  value={userDetails?.projects}
+                  value={projectDetails?.projects}
                   isMulti={true}
                   placeholder="Select Projects"
                   name="projects"
                   options={projectOptions}
                   onChange={(e) =>
-                    setUserDetails((prevData) => ({
+                    setProjectDetails((prevData) => ({
                       ...prevData,
                       projects: [...e],
                     }))
@@ -307,4 +314,4 @@ const UserDetailPage = () => {
   );
 };
 
-export default UserDetailPage;
+export default ProjectDetailPage

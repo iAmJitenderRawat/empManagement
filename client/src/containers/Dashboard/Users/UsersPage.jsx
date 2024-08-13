@@ -38,12 +38,14 @@ import Loading from "../../../components/Loading";
 import Pagination from "../../../components/Pagination";
 import { AddIcon, DeleteIcon, SearchIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdViewList, MdGridView } from "react-icons/md";
+import {IoFemaleSharp, IoMaleSharp } from "react-icons/io5";
 import {
   AiOutlineSortAscending,
   AiOutlineSortDescending,
 } from "react-icons/ai";
 import qs from "query-string";
 import DeleteModal from "../../../components/SimpleModal";
+import ErrorPage from "../../../components/ErrorPage";
 
 const UsersPage = () => {
   const height = getAvailableHeight();
@@ -78,7 +80,7 @@ const UsersPage = () => {
   const { users, limit, totalPages, totalUsers } = data?.data ?? {};
 
   if (isLoading) return <Loading />;
-  if (isError) return <Error message={error||"Failed to load users."} />;
+  if (isError) return <ErrorPage message={error?.data?.message || "Failed to load users."} />;
   return (
     <Box minH={height}>
       <Flex justify={"space-around"} align={"center"}>
@@ -121,7 +123,7 @@ const UsersPage = () => {
               type="text"
               name="search"
               placeholder="Search"
-              value={search||searchText}
+              value={search || searchText}
               onChange={(e) => setSearch(e.target.value)}
             />
             <Button
@@ -160,7 +162,6 @@ const UsersPage = () => {
               <option value="firstName">Name</option>
               <option value="createdAt">Joining Date</option>
             </Select>
-
             <Select
               name="gender"
               value={queryParams?.gender}
@@ -233,10 +234,11 @@ const UsersPage = () => {
             </Flex>
           </Flex>
           <Button
-            p={2}
+            px={5}
             colorScheme={"red"}
             onClick={() => {
               setSearch("");
+              setQueryParams(qp)
               navigate("?page=1");
             }}
           >
@@ -245,7 +247,7 @@ const UsersPage = () => {
         </Flex>
       </Flex>
 
-      <Box>
+      <Box px={5}>
         <Button
           leftIcon={<AddIcon />}
           colorScheme="blue"
@@ -312,6 +314,7 @@ const UsersPage = () => {
                   <Th>Sr No</Th>
                   <Th>Avatar</Th>
                   <Th>Name</Th>
+                  <Th>Gender</Th>
                   <Th>Email</Th>
                   <Th>Joining Date</Th>
                   <Th textAlign={"center"}>Action</Th>
@@ -329,9 +332,10 @@ const UsersPage = () => {
                         alt={user?.firstName}
                       />
                     </Td>
-                    <Td textTransform={"capitalize"}>
+                    <Td textTransform={"capitalize"} color={"orange.500"}>
                       {user?.firstName} {user?.lastName}
                     </Td>
+                    <Td fontWeight={"bold"}>{user?.gender==="male"? <IoMaleSharp color="blue" />:<IoFemaleSharp color="pink" />}</Td>
                     <Td>{user?.email}</Td>
                     <Td>{moment(user?.createdAt).format("L")}</Td>
                     <Td minW={125}>

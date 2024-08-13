@@ -91,7 +91,7 @@ export const registerUser = asyncHandler(async (req, res) => {
           userRole,
           gender,
           accessToken,
-          refreshToken,
+          // refreshToken,
         },
         "User created successfully",
         200
@@ -173,7 +173,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     if (!user) {
       return res.status(400).json(new ApiError("Invalid refresh token", 400));
     }
-    console.log("user.refreshToken", user.refreshToken, incomingRefreshToken);
+
     if (incomingRefreshToken !== user.refreshToken) {
       return res
         .status(400)

@@ -22,21 +22,23 @@ const projectSchema = new Schema(
       required: true,
     },
     projectLead: {
-      type: String,
-      trim: true,
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     projectManager: {
-      type: String,
-      trim: true,
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     startDate: {
       type: Date,
       trim: true,
     },
-    teamMembers: {
-      type: [String],
-      trim: true,
-    },
+    teamMembers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     description: {
       type: String,
       trim: true,

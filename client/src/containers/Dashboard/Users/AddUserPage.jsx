@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useQuery } from "../../../utils/helperFunctions";
+import { styles, useQuery } from "../../../utils/helperFunctions";
 import {
   useAddUserMutation,
   useGetAllProjectsQuery,
@@ -20,11 +20,13 @@ import {
   Select as ChakraSelect,
   Stack,
   useToast,
+  InputRightElement,
+  InputGroup,
 } from "@chakra-ui/react";
 import TagWithCross from "../../../components/TagWithCross";
 import Loading from "../../../components/Loading";
 import ErrorPage from "../../../components/ErrorPage";
-import { AddIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import Select from "react-select";
 
 const AddUserPage = () => {
@@ -33,25 +35,39 @@ const AddUserPage = () => {
     isLoading: isProjectsLoading,
     isError: isProjectsError,
     error: projectsError,
-  } = useGetAllProjectsQuery();
-  const [mode, setMode] = useState("View");
+  } = useGetAllProjectsQuery({page: 1});
+
   const user = {
     firstName: "",
     lastName: "",
+    gender: "",
     email: "",
+    userRole: "user",
+    designation: "",
     bio: "",
     hobbies: [],
     projects: [],
+    password: "",
   };
   const [userDetails, setUserDetails] = useState(user);
+  const [showPassword, setShowPassword] = useState(false);
 
   const avatarUrl = user?.avatar?.secure_url;
 
   const [hobby, setHobby] = useState("");
-  const [addUser, { isLoading: addUserLoading, error: addUserError }] = useAddUserMutation();
+  const [addUser, { isLoading: addUserLoading, error: addUserError }] =
+    useAddUserMutation();
   const toast = useToast();
   const projects = projectsData?.data?.projects;
-  const [project, setProject] = useState("");
+  const projectOptions = projects
+    ?.filter((project) => project.status === "active")
+    ?.map((project) => ({
+      _id: project._id,
+      name: project.name,
+      status: project.status,
+      value: project._id,
+      label: project.name,
+    }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,6 +77,9 @@ const AddUserPage = () => {
   const handleClick = async () => {
     try {
       const result = await addUser(userDetails);
+      if (result?.data?.code === 201) {
+        setUserDetails(user);
+      }
       toast({
         position: "top",
         title: result?.data?.message ?? result.error?.data?.message,
@@ -78,10 +97,15 @@ const AddUserPage = () => {
       });
     }
   };
-  if (addUserLoading || isProjectsLoading) return <Loading />;
+  const submitDisable= !userDetails?.firstName || !userDetails?.userRole || !userDetails?.status || !userDetails?.email || !userDetails?.password || !userDetails?.gender || !userDetails?.designation
+  if (isProjectsLoading) return <Loading />;
 
   if (addUserError || isProjectsError)
-    return <ErrorPage message={addUserError || projectsError?.data?.message} />;
+    return (
+      <ErrorPage
+        message={addUserError?.data?.message || projectsError?.data?.message}
+      />
+    );
   return (
     <main>
       <Center
@@ -100,17 +124,6 @@ const AddUserPage = () => {
                 src={avatarUrl}
               />
             </Box>
-            <Box>
-              {mode === "View" ? (
-                <Button leftIcon={<EditIcon />} onClick={() => setMode("Edit")}>
-                  Edit
-                </Button>
-              ) : (
-                <Button leftIcon={<ViewIcon />} onClick={() => setMode("View")}>
-                  View
-                </Button>
-              )}
-            </Box>
           </HStack>
           <Stack>
             <HStack flexDir={{ base: "column", sm: "row" }}>
@@ -121,7 +134,6 @@ const AddUserPage = () => {
                   name={"firstName"}
                   onChange={handleChange}
                   value={userDetails?.firstName}
-                  disabled={mode === "View"}
                 />
               </FormControl>
               <FormControl>
@@ -131,10 +143,21 @@ const AddUserPage = () => {
                   name={"lastName"}
                   onChange={handleChange}
                   value={userDetails?.lastName}
-                  disabled={mode === "View"}
                 />
               </FormControl>
             </HStack>
+            <FormControl isRequired>
+              <FormLabel>Gender</FormLabel>
+              <ChakraSelect
+                name={"gender"}
+                onChange={handleChange}
+                value={userDetails?.gender}
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </ChakraSelect>
+            </FormControl>
             <FormControl isRequired>
               <FormLabel>Email</FormLabel>
               <Input
@@ -142,8 +165,21 @@ const AddUserPage = () => {
                 name={"email"}
                 onChange={handleChange}
                 value={userDetails?.email}
-                disabled={mode === "View"}
               />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel>Designation</FormLabel>
+              <ChakraSelect
+                name={"designation"}
+                onChange={handleChange}
+                value={userDetails?.designation}
+              >
+                <option value="">Select Designation</option>
+                <option value="associate">Associate</option>
+                <option value="senior-associate">Senior Associate</option>
+                <option value="manager">Manager</option>
+                <option value="director">Director</option>
+              </ChakraSelect>
             </FormControl>
             <FormControl>
               <FormLabel>Bio</FormLabel>
@@ -152,7 +188,6 @@ const AddUserPage = () => {
                 name={"bio"}
                 onChange={handleChange}
                 value={userDetails?.bio}
-                disabled={mode === "View"}
               />
             </FormControl>
             <FormControl>
@@ -169,7 +204,6 @@ const AddUserPage = () => {
                   name={"hobby"}
                   onChange={(e) => setHobby(e.target.value.toUpperCase())}
                   value={hobby}
-                  disabled={mode === "View"}
                   onKeyDown={(e) => {
                     if (hobby !== "" && e.key === "Enter") {
                       setUserDetails((prevData) => ({
@@ -192,7 +226,6 @@ const AddUserPage = () => {
                       setHobby("");
                     }
                   }}
-                  isDisabled={mode === "View"}
                 >
                   Add
                 </Button>
@@ -202,10 +235,9 @@ const AddUserPage = () => {
               <FormControl isRequired>
                 <FormLabel>Role</FormLabel>
                 <ChakraSelect
-                  name={"role"}
+                  name={"userRole"}
                   onChange={handleChange}
-                  value={userDetails?.role}
-                  disabled={mode === "View"}
+                  value={userDetails?.userRole}
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -217,7 +249,6 @@ const AddUserPage = () => {
                   name={"isAvailable"}
                   onChange={handleChange}
                   value={userDetails?.isAvailable}
-                  disabled={mode === "View"}
                 >
                   <option value={true}>Active</option>
                   <option value={false}>Inactive</option>
@@ -226,63 +257,44 @@ const AddUserPage = () => {
             </HStack>
             <FormControl>
               <FormLabel>Projects</FormLabel>
-              <TagWithCross
-                size={"md"}
-                array={userDetails?.projects}
-                setArray={setUserDetails}
-                name={"projects"}
+              <Select
+                styles={styles}
+                // defaultValue={userDetails?.projects}
+                isMulti={true}
+                placeholder="Select Projects"
+                name="projects"
+                options={projectOptions}
+                onChange={(e) =>
+                  setUserDetails((prevData) => ({
+                    ...prevData,
+                    projects: [...e],
+                  }))
+                }
+                className="react-select-container"
+                classNamePrefix="react-select"
               />
-              <HStack>
-                {/* <Select
-                  onChange={(e) => setProject(e.target.value)}
-                  value={project}
-                  disabled={mode === "View"}
-                >
-                  <option value="">Select</option>
-                  {projects?.length > 0 &&
-                    projects?.map((project) => (
-                      <option key={project._id} value={project._id}>
-                        {project.name}
-                      </option>
-                    ))}
-                </Select> */}
-                <Select
-                  defaultValue={userDetails?.projects}
-                  isMulti
-                  name="projects"
-                  options={projects?.map((project) => ({
-                    id: project._id,
-                    name: project.name,
-                    status: project.status,
-                    label: project.name,
-                  }))}
-                  onChange={(e) => setProject(e)}
-                  isDisabled={mode === "View"}
-                  //   className="basic-multi-select"
-                  //   classNamePrefix="select"
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel>Password</FormLabel>
+              <InputGroup>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  name={"password"}
+                  onChange={handleChange}
+                  value={userDetails?.password}
                 />
-                {console.log("userDetails", userDetails)}
-                {console.log("project", project)}
-                <Button
-                  leftIcon={<AddIcon />}
-                  colorScheme="green"
-                  onClick={() => {
-                    if (
-                      project !== "" &&
-                      userDetails?.projects?.includes(project) === false
-                    ) {
-                      setUserDetails((prevData) => ({
-                        ...prevData,
-                        projects: [...userDetails?.projects, project],
-                      }));
-                      setProject("");
-                    }
-                  }}
-                  isDisabled={mode === "View"}
-                >
-                  Add
-                </Button>
-              </HStack>
+                <InputRightElement width="4.5rem">
+                  <Button
+                    variant={"ghost"}
+                    h="1.75rem"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
             </FormControl>
           </Stack>
           <Button
@@ -290,9 +302,8 @@ const AddUserPage = () => {
             loadingText="Updating"
             colorScheme="blue"
             onClick={handleClick}
-            isDisabled={mode === "View"}
           >
-            Update Details
+            Create User
           </Button>
         </Stack>
       </Center>

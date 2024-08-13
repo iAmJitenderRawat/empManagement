@@ -23,7 +23,7 @@ const userSchema = new Schema(
     },
     designation: {
       type: String,
-      enum: ["associate","senior-associate", "manager", "director"],
+      enum: ["associate", "senior-associate", "manager", "director"],
       default: "associate",
     },
     gender: {
@@ -61,9 +61,16 @@ const userSchema = new Schema(
       type: [String],
       trim: true,
     },
-    projects: {
-      type: [{id: {type:String,trim:true}, name: {type:String,trim:true}, status: {type:String}}],
-    },
+    projects: [
+      {
+        id: { type: Schema.Types.ObjectId, ref: "Project" },
+        name: { type: String, trim: true },
+        status: { type: String },
+        label: String,
+        value: String,
+        designation: String,
+      },
+    ],
   },
   { timestamps: true }
 );

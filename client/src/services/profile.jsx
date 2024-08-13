@@ -1,7 +1,7 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout, setCredentials } from "../features/authSlice";
-import { authApi } from "./auth";
+import { authApi, useLogoutMutation } from "./auth";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
@@ -25,6 +25,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());
+      const [logoutUser] = useLogoutMutation();
+      logoutUser();
     }
   }
 

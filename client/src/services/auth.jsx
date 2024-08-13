@@ -15,7 +15,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
-    console.log('api', api)
     if (refreshResult.data) {
       // store the new token
       api.dispatch(setCredentials(refreshResult.data.data));
@@ -23,7 +22,6 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());
-      console.log("first")
     }
   }
 

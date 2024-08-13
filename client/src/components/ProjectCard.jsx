@@ -1,4 +1,5 @@
 import { Badge, Box, Flex, Heading, Text, useColorModeValue } from '@chakra-ui/react'
+import moment from 'moment';
 import React from 'react'
 import { Link } from 'react-router-dom';
 
@@ -15,14 +16,14 @@ const ProjectCard = ({project, children}) => {
       textAlign={"center"}
       textTransform={"capitalize"}
     >
-      <Heading as={"h2"}>{project?.name}</Heading>
+      <Heading as={"h2"} color={"orange.500"}>{project?.name}</Heading>
       <Text>{project?.description}</Text>
       <Text>Status: {project?.status}</Text>
       <Text>Priority:{project?.priority}</Text>
-      <Text>Project-Lead: {project?.projectLead}</Text>
-      <Text>Project-Manager: {project?.projectManager}</Text>
-      <Text>Start-Date: {project?.startDate}</Text>
-      <Text>Due-Date: {project?.startDate}</Text>
+      <Text>Project-Lead: {project?.projectLead ? <Link to={`/dashboard/users?search=${project?.projectLead}`}>#{project?.projectLead}</Link> : "NO LEAD"}</Text>
+      <Text>Project-Manager: {project?.projectManager ? <Link to={`/dashboard/users?search=${project?.projectManager}`}>#{project?.projectManager}</Link> : "NO MANAGER"}</Text>
+      <Text>Start-Date: {moment(project?.startDate).format("L")}</Text>
+      <Text>Due-Date: {moment(project?.startDate).add(project?.timeline, "days").format("L")}</Text>
       <Flex
         flexWrap={"wrap"}
         align={"center"}

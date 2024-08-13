@@ -1,7 +1,7 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout, setCredentials } from "../features/authSlice";
-import { authApi } from "./auth";
+import { useLogoutMutation } from "./auth";
 
 const limit = import.meta.env.VITE_LIMIT;
 
@@ -19,8 +19,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api,
       extraOptions
     );
-    console.log("api", api);
-    console.log("refreshResult", refreshResult);
+
     if (refreshResult.data) {
       // store the new token
       api.dispatch(setCredentials(refreshResult.data.data));
@@ -28,7 +27,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());
-      console.log("first");
+      const [logoutUser] = useLogoutMutation();
+      logoutUser();
     }
   }
 
@@ -54,7 +54,7 @@ export const adminApi = createApi({
     }),
     addUser: builder.mutation({
       query: (user) => ({
-        url: "/admin/addUser",
+        url: "/admin/users/addUser",
         method: "POST",
         body: user,
       }),
@@ -62,7 +62,6 @@ export const adminApi = createApi({
     }),
     userDetail: builder.query({
       query: (id) => {
-        console.log("id", id);
         return {
           url: `/admin/users/${id}`,
           method: "GET",
@@ -97,11 +96,12 @@ export const adminApi = createApi({
       invalidatesTags: ["getAllProjects"],
     }),
     getAllProjects: builder.query({
-      query: (value) => {
-        const page = value ?? 1;
+      query: (queryParams) => {
+       const { page, sortField, sortOrder, search, priority, status } = queryParams;
         return {
-          url: `/admin/projects?page=${page}&limit=${limit}`,
+          url: "/admin/projects",
           method: "GET",
+          params: { page, sortField, sortOrder, search, priority, status },
         };
       },
       providesTags: ["getAllProjects"],

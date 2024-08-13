@@ -6,6 +6,7 @@ import DashboardCard from "../../components/DashboardCard";;
 import { ImUsers } from "react-icons/im";
 import { AiOutlineProject } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import ErrorPage from "../../components/ErrorPage";
 
 const Dashboard = () => {
   const {
@@ -18,15 +19,15 @@ const Dashboard = () => {
     data: projects,
     isLoading: isLoadingProjects,
     isError: isErrorProjects,
-  } = useGetAllProjectsQuery();
+  } = useGetAllProjectsQuery({page:1});
   const { totalProjects } = projects?.data ?? {};
 
   if (isLoadingUsers || isLoadingProjects) {
     return <Loading />;
   }
-  // if(isErrorUsers||isErrorProjects){
-  //   return <Error message={"Failed to load data."} />
-  // }
+  if(isErrorUsers||isErrorProjects){
+    return <ErrorPage message={"Failed to load data."} />
+  }
   return (
     <main>
       <Center>

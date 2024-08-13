@@ -32,11 +32,10 @@ import {
   buildSearchQuery,
   getAvailableHeight,
 } from "../../../utils/helperFunctions";
-import ProfileCard from "../../../components/ProfileCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loading from "../../../components/Loading";
 import Pagination from "../../../components/Pagination";
-import { DeleteIcon, SearchIcon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, SearchIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdViewList, MdGridView } from "react-icons/md";
 import {
   AiOutlineSortAscending,
@@ -45,6 +44,7 @@ import {
 import qs from "query-string";
 import DeleteModal from "../../../components/SimpleModal";
 import ProjectCard from "../../../components/ProjectCard";
+import ErrorPage from "../../../components/ErrorPage";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -58,18 +58,21 @@ const ProjectsPage = () => {
   const page = parseInt(query.get("page")) || 1;
   const [search, setSearch] = useState("");
   const [view, setView] = useState(false);
-  const { data, isLoading, isError, error } =
-    useGetAllProjectsQuery();
-    // qs.parse(location.search)
-    const {projects, limit, totalPages, totalProjects}=data?.data ??{};
+  const { data, isLoading, isError, error } = useGetAllProjectsQuery(
+    qs.parse(location.search)
+  );
+
+  const { projects, limit, totalPages, totalProjects } = data?.data ?? {};
   const qp = {
     page,
-    sortField: "firstName",
+    sortField: "name",
     sortOrder: "asc",
     search: "",
-    gender: "",
+    priority: "",
+    status: "",
   };
   const [queryParams, setQueryParams] = useState(qp);
+
   useEffect(() => {
     const id = setTimeout(() => {
       if (search) navigate(`?search=${search}`);
@@ -81,7 +84,8 @@ const ProjectsPage = () => {
     useDeleteUserMutation();
 
   if (isLoading) return <Loading />;
-  if (isError) return <Error message={error||"Failed to load projects."} />;
+  if (isError)
+    return <ErrorPage message={error || "Failed to load projects."} />;
   return (
     <Box minH={height}>
       <Flex justify={"space-around"} align={"center"}>
@@ -113,7 +117,7 @@ const ProjectsPage = () => {
         align={"center"}
         justify={"space-around"}
         gap={5}
-        flexDir={{ base: "column", sm: "column", md: "row" }}
+        flexDir={{ base: "column", sm: "column", md: "column", lg: "row" }}
       >
         <Flex gap={5} justify={"center"} align={"center"}>
           <Heading as={"h3"} fontSize={"x-large"}>
@@ -144,12 +148,16 @@ const ProjectsPage = () => {
           gap={5}
           justify={"center"}
           align={"center"}
-          flexDir={{ base: "column", sm: "row", md: "row" }}
+          flexDir={{ base: "column", sm: "column", md: "row" }}
         >
           <Heading as={"h3"} fontSize={"x-large"}>
             Filter
           </Heading>
-          <Flex justify={"center"} align={"center"} gap={5}>
+          <Flex
+            justify={"center"}
+            align={"center"}
+            gap={5}
+          >
             <Select
               name="sortField"
               value={queryParams?.sortField}
@@ -160,31 +168,52 @@ const ProjectsPage = () => {
                 navigate(`?${url}`);
               }}
             >
-              <option value="firstName">Name</option>
-              <option value="createdAt">Joining Date</option>
+              <option value="name">Name</option>
+              <option value="startDate">Start Date</option>
             </Select>
-
             <Select
-              name="gender"
-              value={queryParams?.gender}
+              name="priority"
+              value={queryParams?.priority}
               onChange={(e) => {
                 setQueryParams({
                   ...queryParams,
-                  gender: e.target.value,
+                  priority: e.target.value,
                   page: 1,
                 });
                 const params = {
                   ...queryParams,
-                  gender: e.target.value,
+                  priority: e.target.value,
                   page: 1,
                 };
                 const url = buildSearchQuery(params);
                 navigate(`?${url}`);
               }}
             >
-              <option value="">Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
+              <option value="">Priority</option>
+              <option value="low">Low</option>
+              <option value="high">High</option>
+            </Select>
+            <Select
+              name="status"
+              value={queryParams?.status}
+              onChange={(e) => {
+                setQueryParams({
+                  ...queryParams,
+                  status: e.target.value,
+                  page: 1,
+                });
+                const params = {
+                  ...queryParams,
+                  status: e.target.value,
+                  page: 1,
+                };
+                const url = buildSearchQuery(params);
+                navigate(`?${url}`);
+              }}
+            >
+              <option value="">Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
             </Select>
             <Flex>
               <IconButton
@@ -212,6 +241,7 @@ const ProjectsPage = () => {
           <Button
             onClick={() => {
               setSearch("");
+              setQueryParams(qp);
               navigate("?page=1");
             }}
           >
@@ -219,6 +249,15 @@ const ProjectsPage = () => {
           </Button>
         </Flex>
       </Flex>
+      <Box p={5}>
+        <Button
+          leftIcon={<AddIcon />}
+          colorScheme="blue"
+          onClick={() => navigate("/dashboard/projects/add")}
+        >
+          Add Project
+        </Button>
+      </Box>
       {view ? (
         <SimpleGrid
           m={"2em"}
@@ -247,6 +286,16 @@ const ProjectsPage = () => {
                         btnDisplay={"block"}
                         iconBtnDisplay={"none"}
                       />
+                      <Button
+                        leftIcon={<ViewIcon />}
+                        colorScheme="blue"
+                        size={"sm"}
+                        onClick={() =>
+                          navigate(`/dashboard/users/${project?._id}`)
+                        }
+                      >
+                        View
+                      </Button>
                     </Flex>
                   }
                 />
@@ -254,7 +303,7 @@ const ProjectsPage = () => {
             ))
           ) : (
             <Text as={"p"} fontSize={"large"}>
-              No User Found
+              No Project Found
             </Text>
           )}
         </SimpleGrid>
@@ -266,9 +315,9 @@ const ProjectsPage = () => {
                 <Tr>
                   <Th>Sr No</Th>
                   <Th>Name</Th>
-                  <Th>Description</Th>
                   <Th>Status/Priority</Th>
                   <Th>Start Date</Th>
+                  <Th>End Date</Th>
                   <Th textAlign={"center"}>Action</Th>
                 </Tr>
               </Thead>
@@ -278,12 +327,22 @@ const ProjectsPage = () => {
                 projects?.map((project, i) => (
                   <Tr key={project._id}>
                     <Td>{limit * (page - 1) + (i + 1)}</Td>
-                    <Td textTransform={"capitalize"}>{project?.name}</Td>
-                    <Td>{project?.description}</Td>
+                    <Td
+                      textTransform={"capitalize"}
+                      color={"orange.500"}
+                      fontWeight={"bold"}
+                    >
+                      {project?.name}
+                    </Td>
                     <Td>
-                      {project?.status}/{project?.priority}
+                      {project?.status}/ {project?.priority}
                     </Td>
                     <Td>{moment(project?.startDate).format("L")}</Td>
+                    <Td>
+                      {moment(project?.startDate)
+                        .add(project?.timeline, "days")
+                        .format("L")}
+                    </Td>
                     <Td minW={125}>
                       <Flex justify={"space-evenly"}>
                         <Box>
@@ -295,7 +354,7 @@ const ProjectsPage = () => {
                             handleDelete={deleteUser}
                             btnText={"Delete"}
                             title={"Delete User"}
-                            body={`Are you sure you want to delete ${project?.firstName} ${project?.lastName ?? ""} ?`}
+                            body={`Are you sure you want to delete ${project?.name} ?`}
                             btnColorScheme={"red"}
                             actionBtnTitle={"Delete"}
                             actionBtnColorScheme={"red"}
@@ -313,13 +372,45 @@ const ProjectsPage = () => {
                             }}
                           />
                         </Box>
+                        <Box>
+                          <Button
+                            leftIcon={<ViewIcon />}
+                            colorScheme="blue"
+                            size={"sm"}
+                            display={{
+                              base: "none",
+                              sm: "none",
+                              md: "none",
+                              lg: "block",
+                            }}
+                            onClick={() =>
+                              navigate(`/dashboard/projects/${project?._id}`)
+                            }
+                          >
+                            View
+                          </Button>
+                          <IconButton
+                            display={{
+                              base: "block",
+                              sm: "block",
+                              md: "block",
+                              lg: "none",
+                            }}
+                            onClick={() =>
+                              navigate(`/dashboard/projects/${project?._id}`)
+                            }
+                            size={"sm"}
+                            colorScheme="blue"
+                            icon={<ViewIcon />}
+                          />
+                        </Box>
                       </Flex>
                     </Td>
                   </Tr>
                 ))
               ) : (
                 <Text as={"p"} m={5} fontSize={"large"}>
-                  No User Found
+                  No Project Found
                 </Text>
               )}
             </Tbody>

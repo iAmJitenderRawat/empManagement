@@ -6,7 +6,7 @@ const router = Router();
 //users
 router.route("/users").get(verifyJWT, getAllUsers);
 router.route("/users/:id").get(verifyJWT, userDetail);
-router.route("/users/add").post(verifyJWT, createUser);
+router.route("/users/addUser").post(verifyJWT, createUser);
 router.route("/deleteUser/:id").delete(verifyJWT, deleteUser);
 router.route("/updateUser/:id").patch(verifyJWT, updateUser);
 
